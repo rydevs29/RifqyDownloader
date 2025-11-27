@@ -1,147 +1,242 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-  <title>RifqyDownloader 2025</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <style>
-    :root{--c:#00ff41;--bg:#000;--card:#0a0a0a}
-    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    body{background:var(--bg);color:var(--c);font-family:'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:15px;touch-action:manipulation}
-    .box{background:var(--card);padding:40px 30px;border-radius:28px;max-width:520px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,255,65,0.6);border:3px solid var(--c);position:relative;overflow:hidden}
-    .glow{position:absolute;inset:0;background:linear-gradient(45deg,transparent 30%,rgba(0,255,65,0.1) 50%,transparent 70%);animation:glow 4s infinite}
-    @keyframes glow{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
-    h1{font-size:clamp(2.3em,6vw,3.8em);background:linear-gradient(90deg,#0f0,#0ff,#0f0);background-size:200%;-webkit-background-clip:text;color:transparent;animation:shine 6s infinite}
-    @keyframes shine{background-position:200%}
-    p{font-size:1.15em;margin:20px 0;opacity:0.9}
-    .input-group{position:relative;margin:25px 0}
-    #url{width:100%;padding:20px 20px 20px 55px;background:#111;border:2px solid var(--c);border-radius:18px;color:white;font-size:1.15em;transition:.3s}
-    #url:focus{outline:none;transform:scale(1.02);box-shadow:0 0 25px rgba(0,255,65,0.7)}
-    .fa-link{position:absolute;left:20px;top:22px;color:var(--c);font-size:1.3em}
-    button{background:var(--c);color:#000;padding:20px;border:none;border-radius:18px;font-size:1.5em;font-weight:bold;cursor:pointer;width:100%;transition:.4s;position:relative;overflow:hidden}
-    button:hover{transform:scale(1.05);box-shadow:0 0 50px #0f0}
-    button:active{transform:scale(0.98)}
-    #result{margin-top:30px;min-height:100px}
-    video,img{max-width:100%;border-radius:18px;margin:20px 0;box-shadow:0 0 30px #0f0}
-    a{background:#00ffff;color:#000;padding:16px 40px;border-radius:14px;text-decoration:none;font-weight:bold;margin:10px;display:inline-block;transition:.3s}
-    a:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,255,255,0.4)}
-    .footer{margin-top:60px;font-size:0.9em;opacity:0.7}
-    .spinner{display:inline-block;width:22px;height:22px;border:3px solid #333;border-top:3px solid var(--c);border-radius:50%;animation:spin 1s linear infinite;margin-right:10px;vertical-align:middle}
-    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifqyDownloader</title>
+    <style>
+        /* --- CSS: Tampilan Responsif (HP & Desktop) --- */
+        :root {
+            --primary: #6366f1; /* Indigo */
+            --primary-hover: #4f46e5;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 480px; /* Lebar maksimal agar bagus di desktop */
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+        button:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+
+        /* Hasil Download Area */
+        #resultArea {
+            margin-top: 2rem;
+            display: none; /* Sembunyi default */
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1.5rem;
+        }
+
+        .result-img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            max-height: 200px;
+            object-fit: cover;
+        }
+
+        .btn-download {
+            display: block;
+            text-decoration: none;
+            background-color: #10b981; /* Green */
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        
+        .btn-audio { background-color: #f59e0b; } /* Orange */
+
+        .loading {
+            display: none;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+    </style>
 </head>
 <body>
-<div class="box">
-  <div class="glow"></div>
-  <h1>RIFQYDOWNLOADER</h1>
-  <p>TikTok • Instagram • YouTube • Facebook<br><b>Tanpa Watermark • 5 Backup Server • 100% Gratis</b></p>
-  
-  <div class="input-group">
-    <i class="fas fa-link"></i>
-    <input type="text" id="url" placeholder="Paste link video/gambar di sini..." autofocus />
-  </div>
-  
-  <button onclick="gas()">DOWNLOAD SEKARANG</button>
-  
-  <div id="result"></div>
-  
-  <div class="footer">© 2025 RifqyDownloader – 1 File Only – Auto Switch Server</div>
-</div>
 
-<script>
-// 5 CORS PROXY TERBAIK 2025 – Auto Switch (gak pernah mati)
-const proxies = [
-  "https://corsproxy.io/?",                    // Paling cepat Indo
-  "https://api.allorigins.win/raw?url=",       // Super stabil
-  "https://cors.lol/",                         // Unlimited 2025
-  "https://thingproxy.freeboard.io/fetch/",    // Bandel klasik
-  "https://cors-anywhere.herokuapp.com/"      // Cadangan terakhir
-];
+    <div class="card">
+        <span class="logo">RifqyDownloader ⚡</span>
+        <p class="subtitle">Download Video TikTok Tanpa Watermark, Instagram, dll.</p>
 
-// API tercepat + backup
-const apis = {
-  tiktok: [
-    "https://tikwm.com/api/?url=",
-    "https://api.tiklydown.eu.org/api/download?url=",
-    "https://api.savefrom.net/v2/download?url="
-  ],
-  instagram: [
-    "https://api.saveinsta.app/v1/download?url=",
-    "https://v3.igdownloader.app/api/ajaxSearch?q=",
-    "https://api.instagramdownloader.org/dl?url="
-  ],
-  youtube: [
-    "https://p.oceansaver.in/api/youtube?url=",
-    "https://co.wukko.me/api/json",
-    "https://api.ytbvideoly.com/api/convert?url="
-  ],
-  facebook: [
-    "https://api.veeroo.net/v1/facebook?url=",
-    "https://fdown.net/download.php?url=",
-    "https://api.fdownloader.net/v2/download?url="
-  ]
-];
+        <div class="input-group">
+            <label for="urlInput">Tempel Link Video</label>
+            <input type="text" id="urlInput" placeholder="https://tiktok.com/..." autocomplete="off">
+        </div>
 
-async function gas() {
-  const url = document.getElementById("url").value.trim();
-  const result = document.getElementById("result");
-  if (!url) return result.innerHTML = "<p style='color:#f44'>Link kosong bro!</p>";
-  
-  result.innerHTML = "<span class='spinner'></span> Mencari server tercepat...";
+        <button onclick="processDownload()" id="btnSubmit">Download Sekarang</button>
+        <div class="loading" id="loadingText">Sedang memproses...</div>
 
-  let videoUrl = "";
+        <div id="resultArea">
+            <img id="thumb" class="result-img" src="" alt="Thumbnail">
+            <h3 id="videoTitle" style="font-size:1rem; margin-bottom:10px;">Judul Video</h3>
+            
+            <a id="linkVideo" href="#" target="_blank" class="btn-download">🎥 Download Video (No WM)</a>
+            <a id="linkAudio" href="#" target="_blank" class="btn-download btn-audio">🎵 Download Audio (MP3)</a>
+        </div>
 
-  try {
-    // Coba semua proxy + semua API sampai berhasil
-    for (let proxy of proxies) {
-      for (let apiBase of (apis.tiktok.includes(url) ? apis.tiktok :
-                          url.includes("instagram") ? apis.instagram :
-                          url.includes("youtube") || url.includes("youtu.be") ? apis.youtube :
-                          apis.facebook)) {
-        try {
-          const fullUrl = proxy + apiBase + encodeURIComponent(url);
-          const options = apiBase.includes("json") ? {
-            method: "POST",
-            body: JSON.stringify({url}),
-            headers: {"Content-Type":"application/json"}
-          } : {};
-          
-          const r = await fetch(fullUrl, options);
-          if (!r.ok) continue;
-          
-          const d = await r.json().catch(()=>null) || {};
-          const text = await r.text();
-          
-          // Extract video URL dari berbagai format
-          videoUrl = d.data?.play || d.video || d.hd || d.url || d.result || 
-                     d.medias?.[0]?.url || d.download_url || 
-                     text.match(/"hd":"(.*?)"/)?.[1]?.replace(/\\\//g,"/") ||
-                     text.match(/href="(https:\/\/[^"]+\.mp4)/)?.[1];
-          
-          if (videoUrl) {
-            result.innerHTML = `
-              <video controls src="${videoUrl}" style="border-radius:18px;"></video><br>
-              <a href="${videoUrl}" download>
-                <i class="fas fa-download"></i> DOWNLOAD VIDEO HD
-              </a>
-            `;
-            return; // SUCCESS → stop semua loop
-          }
-        } catch(e) {}
-      }
-    }
-    
-    throw "Server lagi penuh";
-  } catch(e) {
-    result.innerHTML = "<p style='color:#f44'>Gagal / link private. Coba link lain ya!</p>";
-  }
-}
+        <div class="footer">
+            &copy; 2024 RifqyDownloader. Built for Web.
+        </div>
+    </div>
 
-// Enter = download
-document.getElementById("url").addEventListener("keyup", e => {
-  if(e.key === "Enter") gas();
-});
-</script>
+    <script>
+        // --- JAVASCRIPT: LOGIKA DOWNLOAD ---
+        
+        async function processDownload() {
+            const url = document.getElementById('urlInput').value.trim();
+            const resultArea = document.getElementById('resultArea');
+            const loading = document.getElementById('loadingText');
+            const btn = document.getElementById('btnSubmit');
+
+            if (!url) {
+                alert("Harap masukkan link URL!");
+                return;
+            }
+
+            // Reset tampilan
+            resultArea.style.display = 'none';
+            loading.style.display = 'block';
+            btn.disabled = true;
+
+            try {
+                // 1. DETEKSI TIKTOK (Menggunakan API TikWM - Gratis & Publik)
+                if (url.includes('tiktok.com')) {
+                    await handleTikTok(url);
+                } 
+                // 2. DETEKSI INSTAGRAM / LAINNYA
+                else if (url.includes('instagram.com')) {
+                    alert("Untuk Instagram di GitHub Pages (Statis), API publik sering berubah. Saat ini demo fokus di TikTok.");
+                    // Di sini Anda perlu API Key dari RapidAPI jika ingin IG jalan stabil di frontend
+                    loading.style.display = 'none';
+                    btn.disabled = false;
+                } 
+                else {
+                    alert("Platform belum didukung di versi Web ini.");
+                    loading.style.display = 'none';
+                    btn.disabled = false;
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("Gagal mengambil data. Pastikan link benar atau coba lagi nanti.");
+                loading.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        // Fungsi Khusus TikTok (Menggunakan TikWM API)
+        async function handleTikTok(url) {
+            // Kita menggunakan TikWM API yang mendukung CORS
+            const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            if (data.code === 0) {
+                // Sukses
+                const vidData = data.data;
+                
+                document.getElementById('thumb').src = vidData.cover;
+                document.getElementById('videoTitle').innerText = vidData.title || "Video TikTok";
+                
+                // Set Link
+                document.getElementById('linkVideo').href = vidData.play; // Link Video No WM
+                document.getElementById('linkAudio').href = vidData.music; // Link Audio
+
+                // Tampilkan
+                document.getElementById('loadingText').style.display = 'none';
+                document.getElementById('resultArea').style.display = 'block';
+                document.getElementById('btnSubmit').disabled = false;
+            } else {
+                throw new Error("Video tidak ditemukan");
+            }
+        }
+    </script>
 </body>
 </html>
