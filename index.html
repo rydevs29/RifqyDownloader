@@ -4,22 +4,92 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RifqyDownloader 2025</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="description" content="Download TikTok, Instagram, YouTube, Facebook tanpa watermark – Gratis Selamanya"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root { --primary: #00ff00; --bg: #000; --card: #111; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--primary); font-family:'Segoe UI',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .container { background:var(--card); padding:30px; border-radius:20px; width:100%; max-width:520px; box-shadow:0 0 40px rgba(0,255,0,0.3); text-align:center; border:2px solid var(--primary); }
+    h1 { font-size:2.8em; margin-bottom:10px; background:linear-gradient(90deg,#0f0,#0ff); -webkit-background-clip:text; color:transparent; }
+    .tagline { font-size:1.1em; margin:15px 0 30px; opacity:0.9; }
+    .input-group { position:relative; margin-bottom:20px; }
+    #url { width:100%; padding:18px 20px 18px 50px; background:#222; border:2px solid var(--primary); border-radius:15px; color:white; font-size:1.1em; }
+    #url:focus { outline:none; box-shadow:0 0 20px rgba(0,255,0,0.5); }
+    .fa-link { position:absolute; left:18px; top:19px; color:var(--primary); }
+    button { background:var(--primary); color:#000; padding:16px 40px; border:none; border-radius:15px; font-size:1.3em; font-weight:bold; cursor:pointer; width:100%; margin-top:10px; transition:0.3s; }
+    button:hover { background:#0f0; transform:scale(1.05); box-shadow:0 0 30px rgba(0,255,0,0.6); }
+    #result { margin-top:30px; }
+    .video-preview { width:100%; border-radius:15px; margin:15px 0; }
+    .download-btn { display:inline-block; background:#0ff; color:#000; padding:12px 30px; margin:10px; border-radius:10px; text-decoration:none; font-weight:bold; }
+    .footer { margin-top:40px; font-size:0.9em; opacity:0.7; }
+    @media (max-width:480px) { h1{font-size:2.2em;} }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>RIFQYDOWNLOADER</h1>
-    <p>Download TikTok • YouTube • Instagram • Facebook • Gambar<br>Tanpa Watermark • Tanpa Login • Gratis Selamanya</p>
-    
-    <div class="input-box">
-      <input type="text" id="url" placeholder="Paste link video/gambar di sini..." />
-      <button onclick="download()">DOWNLOAD</button>
+    <p class="tagline">Download Video & Foto TikTok • Instagram • YouTube • Facebook<br><b>Tanpa Watermark • Tanpa Login • 100% Gratis</b></p>
+
+    <div class="input-group">
+      <i class="fas fa-link"></i>
+      <input type="text" id="url" placeholder="Paste link di sini..." autofocus />
     </div>
+    <button onclick="proses()">DOWNLOAD SEKARANG</button>
 
     <div id="result"></div>
-    <small>Support: TikTok, YouTube, Instagram Reels/Post, Facebook Video, Gambar dari postingan</small>
+
+    <div class="footer">
+      Support: TikTok, Instagram Reels/Story/Post, YouTube, Facebook Video/Reels<br>
+      © 2025 RifqyDownloader – Made with <i class="fas fa-heart" style="color:red"></i> Indonesia
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    async function proses() {
+      const url = document.getElementById("url").value.trim();
+      const result = document.getElementById("result");
+      if (!url) return result.innerHTML = `<p style="color:#ff4444">Link kosong!</p>`;
+
+      result.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Sedang memproses...</p>`;
+
+      let apiUrl = "";
+
+      if (url.includes("tiktok.com") || url.includes("vt.tiktok.com")) {
+        apiUrl = `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`;
+      } else if (url.includes("instagram.com")) {
+        apiUrl = `https://v3.igdownloader.app/api/ajaxSearch?recaptchaToken=&q=${encodeURIComponent(url)}`;
+      } else if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        apiUrl = `https://p.oceansaver.in/api/youtube?url=${encodeURIComponent(url)}`;
+      } else if (url.includes("facebook.com") || url.includes("fb.watch")) {
+        apiUrl = `https://api.veeroo.net/v1/facebook?url=${encodeURIComponent(url)}`;
+      } else {
+        return result.innerHTML = `<p style="color:#ff4444">Link tidak didukung!</p>`;
+      }
+
+      try {
+        const res = await fetch("https://cors.rifqy.workers.dev/?" + apiUrl);
+        const data = await res.json();
+
+        if (data.status === "success" || data.result || data.medias || data.video) {
+          let videoUrl = data.result || data.video || data.medias?.[0]?.url || data.url || data.download_url;
+
+          result.innerHTML = `
+            <video class="video-preview" controls src="${videoUrl}"></video><br>
+            <a href="${videoUrl}" download class="download-btn">
+              <i class="fas fa-download"></i> DOWNLOAD VIDEO
+            </a>
+          `;
+        } else {
+          result.innerHTML = `<p style="color:#ff4444">Gagal: ${data.message || "Link error / private"}</p>`;
+        }
+      } catch (e) {
+        result.innerHTML = `<p style="color:#ff4444">Server sedang penuh, coba lagi 10 detik kemudian.</p>`;
+      }
+    }
+
+    // Enter = download
+    document.getElementById("url").addEventListener("keypress", e => { if(e.key==="Enter") proses(); });
+  </script>
 </body>
 </html>
