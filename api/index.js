@@ -2,7 +2,7 @@
 import { VercelResponse, VercelRequest } from '@vercel/node';
 
 export default async function handler(req, res) {
-    // Pengaturan CORS agar bisa diakses dari frontend
+    // Pengaturan CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -16,15 +16,15 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { url, type } = req.body; // Menerima URL dan Tipe (video/audio)
-
+    const { url, type } = req.body;
+    
     if (!url || !type || (type !== 'video' && type !== 'audio')) {
         return res.status(400).json({ error: 'URL and valid type (video/audio) are required' });
     }
 
     const isAudio = (type === 'audio');
 
-    // --- 8 DAFTAR SERVER CADANGAN (MAXIMUM ROBUSTNESS) ---
+    // --- 8 DAFTAR SERVER CADANGAN ---
     const API_SERVERS = [
         "https://cobalt.place/api/json",
         "https://api.cobalt.tools/api/json",
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         "https://w.nesher.dev/api/json",
         "https://cobalt.cf/api/json",
         "https://res.cobalt.tools/api/json",
-        "https://co.wuk.sh/api/json" // Cadangan terakhir
+        "https://co.wuk.sh/api/json" 
     ];
 
     let lastError = null;
@@ -43,10 +43,9 @@ export default async function handler(req, res) {
         try {
             console.log(`Mencoba server (${type}): ${server}`);
             
-            // Payload disesuaikan untuk Video atau Audio
             const payload = {
                 url: url,
-                vQuality: isAudio ? "max" : "720", // Kualitas maksimal untuk audio
+                vQuality: isAudio ? "max" : "720", 
                 isAudioOnly: isAudio,
                 filenamePattern: "basic"
             };
@@ -60,11 +59,16 @@ export default async function handler(req, res) {
                 body: JSON.stringify(payload)
             });
 
+            // *** PERBAIKAN PENTING: Cek status HTTP sebelum parsing JSON ***
+            if (!response.ok) {
+                 throw new Error(`Server ${new URL(server).hostname} mengembalikan status ${response.status}`);
+            }
+
             const data = await response.json();
 
-            // Cek apakah sukses dan memiliki link download
+            // Cek apakah sukses
             if (data && (data.url || data.status === 'stream' || data.status === 'redirect')) {
-                // BERHASIL! Kembalikan data ke Frontend
+                // BERHASIL!
                 return res.status(200).json({
                     success: true,
                     server_used: new URL(server).hostname,
