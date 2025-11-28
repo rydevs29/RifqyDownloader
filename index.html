@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifqyDownloader Pro</title>
+    <style>
+        /* --- CSS MODERN --- */
+        :root {
+            --primary: #4f46e5;
+            --secondary: #ec4899;
+            --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: #ffffff;
+        }
+
+        body {
+            background: var(--bg-grad);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Status & Logs */
+        .status-log {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #64748b;
+            min-height: 20px;
+        }
+
+        /* Result Area */
+        #resultArea {
+            display: none;
+            margin-top: 2rem;
+            animation: fadeIn 0.5s ease;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 1.5rem;
+        }
+
+        .btn-download {
+            display: block;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-weight: 600;
+            text-align: center;
+            color: white;
+        }
+
+        .btn-video { background: #10b981; }
+        .btn-audio { background: #f59e0b; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h1>RifqyDownloader</h1>
+            <div class="badges">
+                <span class="badge">TikTok</span>
+                <span class="badge">Instagram</span>
+                <span class="badge">Facebook</span>
+                <span class="badge">YouTube</span>
+                <span class="badge">Twitter/X</span>
+            </div>
+        </div>
+
+        <div class="input-box">
+            <input type="text" id="urlInput" placeholder="Tempel link video di sini..." autocomplete="off">
+        </div>
+
+        <button onclick="startDownload()" id="btnSubmit">Download</button>
+        <div class="status-log" id="statusLog"></div>
+
+        <div id="resultArea">
+            <h3 id="resTitle" style="margin-bottom: 10px; font-size: 1.1rem; color:#333;">Judul Video</h3>
+            <p id="resSource" style="font-size: 0.8rem; color:#888; margin-bottom: 15px;">Source: -</p>
+            
+            <a id="linkVideo" href="#" target="_blank" class="btn-download btn-video">🎥 Download Video</a>
+            <a id="linkAudio" href="#" target="_blank" class="btn-download btn-audio">🎵 Download Audio</a>
+        </div>
+    </div>
+
+    <script>
+        const log = (msg) => document.getElementById('statusLog').innerText = msg;
+        
+        async function startDownload() {
+            const url = document.getElementById('urlInput').value.trim();
+            const btn = document.getElementById('btnSubmit');
+            const resultArea = document.getElementById('resultArea');
+
+            if (!url) { alert("Link kosong!"); return; }
+
+            // Reset UI
+            resultArea.style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = "Memproses...";
+            log("Menganalisis link...");
+
+            try {
+                // LOGIKA MULTI-PLATFORM
+                if (url.includes('tiktok.com') && !url.includes('music')) {
+                    log("Mencoba Server TikTok...");
+                    try {
+                        await fetchTikTok(url);
+                    } catch (e) {
+                        log("Server 1 Gagal. Mencoba Backup Server...");
+                        await fetchViaVercel(url); // Backup ke API Vercel kita
+                    }
+                } 
+                else {
+                    // Untuk YouTube, IG, FB, X, dll
+                    log("Menghubungi Server API Vercel...");
+                    await fetchViaVercel(url);
+                }
+
+                log("Selesai! Silakan download.");
+
+            } catch (error) {
+                console.error(error);
+                log("❌ Gagal: " + error.message);
+                // Pesan error user friendly
+                alert("Gagal mengambil video. Pastikan link benar atau coba beberapa saat lagi.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Download";
+            }
+        }
+
+        // --- API 1: TIKTOK (Tetap Client Side karena sering bisa) ---
+        async function fetchTikTok(url) {
+            // Kita coba TikWM dulu karena cepat
+            const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            const res = await fetch(apiUrl);
+            const data = await res.json();
+
+            if (data.code === 0) {
+                showResult(
+                    data.data.title || "TikTok Video", 
+                    "TikWM Server", 
+                    data.data.play, 
+                    data.data.music
+                );
+            } else {
+                throw new Error("TikWM Fail");
+            }
+        }
+
+        // --- API 2: UNIVERSAL VIA VERCEL (SOLUSI YT/IG/X) ---
+        async function fetchViaVercel(url) {
+            // Kita panggil API yang kita buat di folder /api/index.js
+            // Karena di Vercel, pathnya relatif '/api/index'
+            
+            const response = await fetch('/api/index', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: url })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                showResult(
+                    data.title || "Video Social Media",
+                    "Rifqy Server (Multi-Node)",
+                    data.url,
+                    data.audio
+                );
+            } else {
+                throw new Error(data.message || "Gagal mengambil data dari server.");
+            }
+        }
+
+        function showResult(title, source, videoUrl, audioUrl) {
+            document.getElementById('resTitle').innerText = title.substring(0, 60) + (title.length > 60 ? "..." : "");
+            document.getElementById('resSource').innerText = "Server: " + source;
+            
+            const btnVideo = document.getElementById('linkVideo');
+            const btnAudio = document.getElementById('linkAudio');
+            const resultArea = document.getElementById('resultArea');
+
+            // Set Video
+            btnVideo.href = videoUrl;
+            btnVideo.style.display = "block";
+            btnVideo.innerText = "🎥 Download Video";
+
+            // Set Audio
+            if (audioUrl) {
+                btnAudio.href = audioUrl;
+                btnAudio.style.display = "block";
+                btnAudio.innerText = "🎵 Download Audio";
+            } else {
+                btnAudio.style.display = "none";
+            }
+
+            resultArea.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
