@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RifqyDownloader Pro</title>
+    <title>RifqyDownloader Pro - Fix Vercel API</title>
     <style>
-        /* --- CSS MODERN --- */
+        /* --- CSS MODERN (TIDAK DIUBAH) --- */
         :root {
             --primary: #4f46e5;
             --secondary: #ec4899;
@@ -135,6 +135,7 @@
 
         .btn-video { background: #10b981; }
         .btn-audio { background: #f59e0b; }
+        .btn-manual { background: #ef4444; } /* Warna baru untuk fallback */
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -188,11 +189,11 @@
             try {
                 // LOGIKA MULTI-PLATFORM
                 if (url.includes('tiktok.com') && !url.includes('music')) {
-                    log("Mencoba Server TikTok...");
+                    log("Mencoba Server TikTok (TikWM)...");
                     try {
                         await fetchTikTok(url);
                     } catch (e) {
-                        log("Server 1 Gagal. Mencoba Backup Server...");
+                        log("TikWM gagal. Mencoba Backup Server Vercel...");
                         await fetchViaVercel(url); // Backup ke API Vercel kita
                     }
                 } 
@@ -206,23 +207,21 @@
 
             } catch (error) {
                 console.error(error);
-                log("❌ Gagal: " + error.message);
-                // Pesan error user friendly
-                alert("Gagal mengambil video. Pastikan link benar atau coba beberapa saat lagi.");
+                // Hanya menampilkan pesan umum jika error
+                log("❌ Gagal: Cek tombol manual di bawah.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Download";
             }
         }
 
-        // --- API 1: TIKTOK (Tetap Client Side karena sering bisa) ---
+        // --- API 1: TIKTOK (Server Cepat) ---
         async function fetchTikTok(url) {
-            // Kita coba TikWM dulu karena cepat
             const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
             const res = await fetch(apiUrl);
             const data = await res.json();
 
-            if (data.code === 0) {
+            if (data.code === 0 && data.data.play) {
                 showResult(
                     data.data.title || "TikTok Video", 
                     "TikWM Server", 
@@ -236,8 +235,8 @@
 
         // --- API 2: UNIVERSAL VIA VERCEL (SOLUSI YT/IG/X) ---
         async function fetchViaVercel(url) {
-            // Kita panggil API yang kita buat di folder /api/index.js
-            // Karena di Vercel, pathnya relatif '/api/index'
+            // Memanggil backend Vercel yang menggunakan Server Cadangan (Cobalt Rotator)
+            log("Menggunakan Server Rifqy (Multi-Node)...");
             
             const response = await fetch('/api/index', {
                 method: "POST",
@@ -245,17 +244,22 @@
                 body: JSON.stringify({ url: url })
             });
 
-            const data = await response.json();
+            const result = await response.json();
 
-            if (data.status === 'success') {
+            if (result.status === 'success') {
                 showResult(
-                    data.title || "Video Social Media",
+                    result.data.title || "Video Social Media",
                     "Rifqy Server (Multi-Node)",
-                    data.url,
-                    data.audio
+                    result.data.url,
+                    result.data.audio
                 );
             } else {
-                throw new Error(data.message || "Gagal mengambil data dari server.");
+                // JIKA GAGAL DI SEMUA SERVER CADANGAN (Cobalt, dll)
+                console.error("API Vercel Error:", result.message);
+                handleManualFallback(url); // Panggil fungsi fallback manual
+                
+                // Mencegah block finally, agar log error ditampilkan
+                throw new Error("Dialihkan ke manual download."); 
             }
         }
 
@@ -266,6 +270,10 @@
             const btnVideo = document.getElementById('linkVideo');
             const btnAudio = document.getElementById('linkAudio');
             const resultArea = document.getElementById('resultArea');
+
+            // Reset kelas CSS dan text
+            btnVideo.classList.remove('btn-manual');
+            btnVideo.classList.add('btn-video');
 
             // Set Video
             btnVideo.href = videoUrl;
@@ -281,6 +289,45 @@
                 btnAudio.style.display = "none";
             }
 
+            resultArea.style.display = 'block';
+        }
+        
+        // --- FUNGSI FALLBACK MANUAL (Jika semua API gagal) ---
+        function handleManualFallback(url) {
+            document.getElementById('resTitle').innerText = "⚠️ Server Utama Gagal / Protected";
+            document.getElementById('resSource').innerText = "Coba download manual lewat layanan luar:";
+            
+            const btnVideo = document.getElementById('linkVideo');
+            const btnAudio = document.getElementById('linkAudio');
+            const resultArea = document.getElementById('resultArea');
+
+            // Set tombol menjadi MANUAL
+            btnVideo.classList.remove('btn-video');
+            btnVideo.classList.add('btn-manual');
+            
+            let manualUrl = "#";
+
+            // Logic link fallback ke layanan pihak ketiga
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                // Menggunakan ssyoutube sebagai fallback standar untuk YT
+                manualUrl = url.replace("youtube.com", "ssyoutube.com").replace("youtu.be/", "ssyoutube.com/");
+                btnVideo.innerText = "➡️ Buka SSYouTube (Download Manual)";
+            } else if (url.includes('tiktok.com')) {
+                manualUrl = "https://snaptik.app";
+                btnVideo.innerText = "➡️ Buka SnapTik (Download Manual)";
+            } else if (url.includes('instagram.com') || url.includes('facebook.com') || url.includes('twitter.com') || url.includes('x.com')) {
+                // Generic fallback
+                manualUrl = `https://savefrom.net/?url=${encodeURIComponent(url)}`;
+                btnVideo.innerText = "➡️ Buka SaveFrom.net (Download Manual)";
+            } else {
+                btnVideo.innerText = "❌ Gagal Download Otomatis";
+                btnVideo.href = "#";
+            }
+            
+            btnVideo.href = manualUrl;
+            btnVideo.style.display = "block";
+            btnAudio.style.display = "none"; // Sembunyikan tombol Audio
+            
             resultArea.style.display = 'block';
         }
     </script>
