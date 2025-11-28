@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifqyDownloader Pro</title>
+    <style>
+        /* (CSS TIDAK DIUBAH) */
+        :root { --primary: #4f46e5; --secondary: #ec4899; --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); --card-bg: #ffffff; }
+        body { background: var(--bg-grad); min-height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        .card { background: var(--card-bg); width: 100%; max-width: 500px; padding: 2rem; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center; }
+        .header h1 { margin: 0; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; font-weight: 800; }
+        .badges { display: flex; justify-content: center; gap: 8px; margin: 10px 0 20px 0; flex-wrap: wrap; }
+        .badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; background: #f1f5f9; color: #64748b; font-weight: 600; }
+        .input-box { position: relative; margin-bottom: 1.5rem; }
+        input { width: 100%; padding: 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem; outline: none; transition: 0.3s; box-sizing: border-box; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+        .status-log { margin-top: 15px; font-size: 0.85rem; color: #64748b; min-height: 20px; }
+        #resultArea { display: none; margin-top: 2rem; animation: fadeIn 0.5s ease; border-top: 1px dashed #cbd5e1; padding-top: 1.5rem; }
+        .btn-download { display: block; text-decoration: none; padding: 12px; border-radius: 10px; margin-top: 10px; font-weight: 600; text-align: center; color: white; }
+        .btn-video { background: #10b981; }
+        .btn-audio { background: #f59e0b; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h1>RifqyDownloader</h1>
+            <div class="badges">
+                <span class="badge">TikTok</span>
+                <span class="badge">Instagram</span>
+                <span class="badge">Facebook</span>
+                <span class="badge">YouTube</span>
+                <span class="badge">Twitter/X</span>
+            </div>
+        </div>
+
+        <div class="input-box">
+            <input type="text" id="urlInput" placeholder="Tempel link video di sini..." autocomplete="off">
+        </div>
+
+        <button onclick="startProcessing()" id="btnSubmit">Proses Link</button>
+        <div class="status-log" id="statusLog"></div>
+
+        <div id="resultArea">
+            <h3 id="resTitle" style="margin-bottom: 10px; font-size: 1.1rem; color:#333;">Link Berhasil Diproses!</h3>
+            <p id="resSource" style="font-size: 0.8rem; color:#888; margin-bottom: 15px;">Source: -</p>
+            
+            <a id="linkVideo" href="#" target="_blank" onclick="startDownload('video')" class="btn-download btn-video">🎥 Dapatkan Link Video</a>
+            <a id="linkAudio" href="#" target="_blank" onclick="startDownload('audio')" class="btn-download btn-audio">🎵 Dapatkan Link Audio</a>
+            
+            <p style="margin-top: 10px; font-size: 0.75rem; color:#888;">*Klik tombol di atas untuk memulai pencarian di server cadangan.</p>
+        </div>
+    </div>
+
+    <script>
+        const log = (msg) => document.getElementById('statusLog').innerText = msg;
+        
+        // Fungsi Utama untuk Menganalisis Link (Hanya Menampilkan Area Hasil)
+        function startProcessing() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) { alert("Link kosong!"); return; }
+
+            // Reset UI
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('btnSubmit').disabled = true;
+            document.getElementById('btnSubmit').innerText = "Link Diproses...";
+            log("Link siap diunduh. Pilih format di bawah.");
+
+            // Tombol "Dapatkan Link" di resultArea direset
+            document.getElementById('linkVideo').href = "#";
+            document.getElementById('linkAudio').href = "#";
+            document.getElementById('linkVideo').innerText = "🎥 Dapatkan Link Video";
+            document.getElementById('linkAudio').innerText = "🎵 Dapatkan Link Audio";
+            
+            document.getElementById('resTitle').innerText = "Link Berhasil Diproses!";
+            document.getElementById('resSource').innerText = "URL: " + url.substring(0, 40) + "...";
+
+            document.getElementById('btnSubmit').disabled = false;
+            document.getElementById('btnSubmit').innerText = "Proses Link";
+            document.getElementById('resultArea').style.display = 'block';
+        }
+
+        // Fungsi yang Sebenarnya Memanggil API Vercel
+        async function startDownload(type) {
+            const url = document.getElementById('urlInput').value.trim();
+            const btn = document.getElementById(type === 'video' ? 'linkVideo' : 'linkAudio');
+            
+            if (!url) return;
+
+            // Update UI
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = `🔄 Mencari ${type}... (Vercel)`;
+            log(`Meminta link ${type} ke Vercel API...`);
+
+            try {
+                // Panggil API Vercel dengan tipe media yang spesifik
+                const res = await fetch('/api/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, type: type })
+                });
+
+                const json = await res.json();
+
+                if (!json.success || !json.data.url) {
+                    throw new Error(json.error || `Server ${json.server_used} gagal mendapatkan ${type}`);
+                }
+
+                // BERHASIL! Arahkan tombol ke link hasil
+                log(`Berhasil mendapatkan link ${type} dari server: ${json.server_used}`);
+                btn.href = json.data.url;
+                btn.innerText = `✅ Unduh ${type.toUpperCase()}`;
+                
+                // Memicu klik untuk memulai unduhan otomatis
+                window.open(json.data.url, '_blank');
+
+            } catch (error) {
+                console.error(error);
+                log(`❌ Gagal mendapatkan link ${type}: ${error.message}`);
+                btn.innerText = `❌ Gagal Unduh ${type.toUpperCase()}`;
+            } finally {
+                btn.disabled = false;
+                // Tombol dipertahankan di status berhasil/gagal (tidak kembali ke text awal)
+            }
+        }
+    </script>
+</body>
+</html>
