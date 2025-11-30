@@ -1,18 +1,17 @@
-// api/index.js
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
-    // 1. CORS Configuration (Agar bisa diakses dari web kamu)
+    // 1. CORS Headers (Agar bisa diakses dari frontend mana saja)
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, User-Agent');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Handle Preflight Request
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
-    // Ambil URL dari body atau query
+    // 2. Ambil URL dari request
     const { url } = req.body || req.query;
 
     if (!url) {
@@ -21,42 +20,36 @@ export default async function handler(req, res) {
 
     console.log(`[Processing] URL: ${url}`);
 
-    // 2. Daftar Server Cobalt (Diurutkan dari yang paling sakti untuk YouTube)
+    // 3. Daftar Server Cobalt (Backup Redundancy)
+    // Server ini yang melakukan "magic" download
     const cobaltInstances = [
-        "https://co.wuk.sh/api/json",                // Sangat stabil untuk YT
-        "https://api.cobalt.tools/api/json",         // Official (Sering rate limit, tapi akurat)
+        "https://co.wuk.sh/api/json",                // Server Utama (Paling Stabil)
+        "https://api.cobalt.tools/api/json",         // Official Instance
         "https://cobalt.api.kwiatekmiki.pl/api/json", // Backup Eropa
-        "https://api.server.lunes.host/api/json",    // Backup US
-        "https://cobalt.adeprolin.com/api/json"      // Cadangan akhir
+        "https://api.server.lunes.host/api/json"     // Backup US
     ];
 
-    // 3. Header Penyamaran (Supaya tidak dideteksi sebagai Bot Vercel)
+    // Header palsu agar request terlihat seperti dari browser
     const fakeHeaders = {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Origin": "https://cobalt.tools",
-        "Referer": "https://cobalt.tools/"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     };
 
     let finalResult = null;
     let success = false;
-    let errorMessage = "";
 
-    // 4. Logic Loop: Coba satu per satu server
+    // 4. Logic Loop: Mencoba server satu per satu jika ada yang error
     for (const server of cobaltInstances) {
-        if (success) break; // Jika sudah berhasil, stop loop
+        if (success) break; // Stop jika sudah dapat hasil
 
         try {
-            console.log(`Trying server: ${server}`);
-            
-            // Konfigurasi Payload (Data yang dikirim)
+            // Payload (Data yang dikirim ke Cobalt)
             const payload = {
                 url: url,
-                vQuality: "720",        // Target kualitas HD
+                vQuality: "720",        // Kualitas video target
                 filenamePattern: "basic",
-                isAudioOnly: false,
-                disableMetadata: true   // Mengurangi beban request
+                isAudioOnly: false
             };
 
             const response = await fetch(server, {
@@ -67,49 +60,56 @@ export default async function handler(req, res) {
 
             const data = await response.json();
 
-            // Cek apakah response valid
+            // Cek apakah data valid
             if (data && (data.url || data.stream || data.picker)) {
                 
-                // KASUS KHUSUS: Youtube Picker (Kadang Cobalt minta milih video/audio)
+                // --- KASUS: CAROUSEL / MULTIPLE MEDIA (Threads / X) ---
                 if (data.picker) {
-                    // Ambil item pertama dari picker jika ada
-                    const item = data.picker.find(p => p.type === 'video') || data.picker[0];
+                    // Ambil item pertama dari galeri
+                    const firstItem = data.picker[0];
+                    
                     finalResult = {
-                        url: item.url,
-                        title: "Video Downloaded (Picker)",
+                        url: firstItem.url,
+                        title: "Media Gallery Result",
+                        type: firstItem.type, // 'photo' atau 'video'
                         audio: null
                     };
-                } else {
+                } 
+                // --- KASUS: SINGLE MEDIA ---
+                else {
                     finalResult = {
                         url: data.url || data.stream,
-                        title: data.filename || "Video Result",
-                        audio: data.audio || null // Kadang Cobalt misahin audio
+                        title: data.filename || "Downloaded Media",
+                        type: 'video', // Default asumsi video
+                        audio: data.audio || null
                     };
+
+                    // Koreksi jika outputnya audio murni (contoh: Soundcloud/Voice Note)
+                    if (finalResult.url && (finalResult.url.includes('.mp3') || finalResult.url.includes('.m4a'))) {
+                        finalResult.type = 'audio';
+                    }
                 }
                 
                 success = true;
-                console.log(`Success on ${server}`);
-            } else {
-                // Simpan error message dari server terakhir untuk debug
-                if (data && data.text) errorMessage = data.text;
+                console.log(`Success fetching from ${server}`);
             }
 
         } catch (e) {
-            console.error(`Failed on ${server}: ${e.message}`);
+            console.warn(`Failed on ${server}: ${e.message}`);
         }
     }
 
-    // 5. Response ke Web Kamu
+    // 5. Kirim Response Balik ke Frontend
     if (success && finalResult) {
         return res.status(200).json({
             status: 'success',
             data: finalResult
         });
     } else {
-        // Gagal total di semua server
+        // Jika semua server gagal
         return res.status(500).json({
             status: 'error',
-            message: errorMessage || 'Gagal mengambil data. Server YouTube mungkin sedang memblokir akses.'
+            message: 'Semua server sibuk atau konten diprivate.'
         });
     }
 }
