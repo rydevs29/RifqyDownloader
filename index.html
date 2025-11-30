@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RifqyDownloader - Universal Social Saver</title>
+    <title>RifqyDownloader Pro</title>
     <style>
-        /* --- CSS MODERN & RESPONSIVE --- */
+        /* --- CSS UPDATE: BLUE THEME --- */
         :root {
-            --primary: #1877f2; /* Facebook Blue */
-            --secondary: #4f46e5;
-            --dark: #0f172a;
+            --primary-blue: #0066ff; /* Biru Utama */
+            --hover-blue: #0052cc;
             --bg-grad: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             --card-bg: #ffffff;
+            --text-dark: #333333;
         }
 
         body {
@@ -23,7 +23,7 @@
             font-family: 'Segoe UI', sans-serif;
             padding: 20px;
             margin: 0;
-            color: var(--dark);
+            color: var(--text-dark);
         }
 
         .card {
@@ -31,20 +31,16 @@
             width: 100%;
             max-width: 480px;
             padding: 2rem;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.5);
         }
 
         .header h1 {
             margin: 0;
-            background: linear-gradient(to right, var(--secondary), #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.2rem;
+            color: var(--primary-blue);
+            font-size: 2rem;
             font-weight: 800;
-            letter-spacing: -1px;
         }
 
         .badges {
@@ -56,17 +52,14 @@
         }
 
         .badge {
-            font-size: 0.7rem;
-            padding: 6px 12px;
-            border-radius: 50px;
-            background: #f1f5f9;
-            color: #475569;
-            font-weight: 700;
-            border: 1px solid #e2e8f0;
-            transition: 0.2s;
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background: #f0f7ff;
+            color: var(--primary-blue);
+            font-weight: 600;
+            border: 1px solid #cce0ff;
         }
-        
-        .badge:hover { background: #e2e8f0; transform: scale(1.05); }
 
         /* Input Area */
         .input-box {
@@ -76,39 +69,36 @@
 
         input {
             width: 100%;
-            padding: 16px 20px;
+            padding: 15px;
             border: 2px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 10px;
             font-size: 1rem;
             outline: none;
             transition: 0.3s;
             box-sizing: border-box;
-            background: #f8fafc;
         }
 
         input:focus {
-            border-color: var(--secondary);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
         }
 
         button {
             width: 100%;
-            padding: 16px;
-            background: var(--dark);
+            padding: 15px;
+            background: var(--primary-blue); /* TOMBOL BIRU */
             color: white;
             border: none;
-            border-radius: 16px;
+            border-radius: 10px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
+            background: var(--hover-blue);
+            transform: translateY(-1px);
         }
 
         button:disabled {
@@ -120,8 +110,8 @@
         /* Status & Logs */
         .status-log {
             margin-top: 15px;
-            font-size: 0.85rem;
-            color: #64748b;
+            font-size: 0.9rem;
+            color: #555;
             min-height: 20px;
             font-weight: 500;
         }
@@ -130,35 +120,30 @@
         #resultArea {
             display: none;
             margin-top: 2rem;
-            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            border-top: 1px dashed #cbd5e1;
+            border-top: 1px solid #eee;
             padding-top: 1.5rem;
         }
 
         .btn-download {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: block;
             text-decoration: none;
-            padding: 14px;
-            border-radius: 14px;
+            padding: 12px;
+            border-radius: 8px;
             margin-top: 10px;
-            font-weight: 700;
+            font-weight: 600;
             text-align: center;
             color: white;
             transition: 0.2s;
-            gap: 8px;
         }
 
-        .btn-download:hover { opacity: 0.95; transform: scale(1.02); }
+        .btn-download:hover { opacity: 0.9; }
 
-        /* Variant Warna Tombol */
-        .btn-video { background: #10b981; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); } 
-        .btn-photo { background: #3b82f6; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); } 
-        .btn-audio { background: #f59e0b; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); } 
-        .btn-manual { background: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); } 
+        /* Warna Tombol Hasil */
+        .btn-video { background: #0066ff; } /* Biru */
+        .btn-photo { background: #0066ff; } /* Biru juga (seragam) */
+        .btn-audio { background: #f59e0b; } /* Kuning/Oranye */
+        .btn-manual { background: #ef4444; } /* Merah untuk fallback */
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -169,7 +154,7 @@
             <div class="badges">
                 <span class="badge">Facebook</span>
                 <span class="badge">Threads</span>
-                <span class="badge">Twitter/X</span>
+                <span class="badge">Twitter</span>
                 <span class="badge">TikTok</span>
                 <span class="badge">Instagram</span>
                 <span class="badge">YouTube</span>
@@ -177,17 +162,17 @@
         </div>
 
         <div class="input-box">
-            <input type="text" id="urlInput" placeholder="Tempel link FB/IG/Threads/dll..." autocomplete="off">
+            <input type="text" id="urlInput" placeholder="Tempel link video di sini..." autocomplete="off">
         </div>
 
-        <button onclick="startDownload()" id="btnSubmit">🚀 Mulai Download</button>
+        <button onclick="startDownload()" id="btnSubmit">Download</button>
         <div class="status-log" id="statusLog"></div>
 
         <div id="resultArea">
-            <h3 id="resTitle" style="margin-bottom: 5px; font-size: 1.1rem; color:#333;">Media Found</h3>
-            <p id="resSource" style="font-size: 0.75rem; color:#888; margin-bottom: 15px; font-style: italic;">Server: -</p>
+            <h3 id="resTitle" style="margin-bottom: 5px; font-size: 1.1rem; color:#333;">Judul Media</h3>
+            <p id="resSource" style="font-size: 0.8rem; color:#666; margin-bottom: 15px;">Source of: -</p>
             
-            <a id="linkMain" href="#" target="_blank" class="btn-download btn-video">🎥 Download Video</a>
+            <a id="linkMain" href="#" target="_blank" class="btn-download btn-video">🎥 Download Video HD</a>
             
             <a id="linkAudio" href="#" target="_blank" class="btn-download btn-audio">🎵 Download Audio</a>
         </div>
@@ -201,52 +186,52 @@
             const btn = document.getElementById('btnSubmit');
             const resultArea = document.getElementById('resultArea');
 
-            if (!url) { alert("Link tidak boleh kosong!"); return; }
+            if (!url) { alert("Link tidak boleh kosong"); return; }
 
             // Reset UI
             resultArea.style.display = 'none';
             btn.disabled = true;
-            btn.innerText = "⏳ Sedang Memproses...";
+            btn.innerText = "Sedang Memproses...";
             
-            // LOG & DETEKSI PLATFORM
-            if (url.includes('facebook.com') || url.includes('fb.watch')) log("🔍 Menganalisis Link Facebook...");
-            else if (url.includes('twitter.com') || url.includes('x.com')) log("🔍 Menganalisis Link Twitter/X...");
-            else if (url.includes('threads.net')) log("🔍 Menganalisis Link Threads...");
-            else if (url.includes('instagram.com')) log("🔍 Menganalisis Link Instagram...");
-            else if (url.includes('tiktok.com')) log("🔍 Menganalisis Link TikTok...");
-            else log("🔍 Menganalisis Link...");
+            // LOG TANPA ICON
+            if (url.includes('facebook.com') || url.includes('fb.watch')) log("Menganalisis Link Facebook...");
+            else if (url.includes('twitter.com') || url.includes('x.com')) log("Menganalisis Link Twitter...");
+            else if (url.includes('threads.net')) log("Menganalisis Link Threads...");
+            else if (url.includes('instagram.com')) log("Menganalisis Link Instagram...");
+            else if (url.includes('tiktok.com')) log("Menganalisis Link TikTok...");
+            else log("Menganalisis Link...");
 
             try {
-                // --- STRATEGI DOWNLOAD ---
+                // --- PROSES DOWNLOAD ---
                 
-                // KASUS 1: TIKTOK (Coba API Client-Side dulu biar cepet)
+                // 1. TIKTOK (Coba TikWM dulu)
                 if (url.includes('tiktok.com') && !url.includes('music')) {
-                    log("🔄 Menghubungi Server TikTok (Jalur Cepat)...");
+                    log("Menghubungi Server TikTok...");
                     try {
                         await fetchTikTok(url);
                     } catch (e) {
-                        log("⚠️ Jalur Cepat Gagal. Mengalihkan ke Server Utama...");
+                        log("Server TikTok sibuk, mencoba jalur alternatif...");
                         await fetchViaVercel(url); 
                     }
                 } 
-                // KASUS 2: SEMUA MEDSOS LAIN (FB, IG, X, Threads, YT)
+                // 2. SOCIAL MEDIA LAINNYA
                 else {
-                    log("Menghubungkan keserver RifqyDev (Multi-Node)...");
+                    log("Menghubungi Server API...");
                     await fetchViaVercel(url);
                 }
 
-                log("✅ Selesai! Klik tombol di bawah.");
+                log("Selesai, Silahkan Download");
 
             } catch (error) {
                 console.error(error);
-                log("❌ Gagal Otomatis. Gunakan opsi manual di bawah.");
+                log("Gagal, silahkan gunakan link manual di bawah");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Download";
             }
         }
 
-        // --- API 1: TIKTOK CLIENT SIDE ---
+        // --- API 1: TIKTOK ---
         async function fetchTikTok(url) {
             const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
             const res = await fetch(apiUrl);
@@ -255,7 +240,7 @@
             if (data.code === 0 && data.data.play) {
                 showResult(
                     data.data.title || "TikTok Video", 
-                    "TikWM (Direct)", 
+                    "TikWM Server", 
                     data.data.play, 
                     data.data.music,
                     'video'
@@ -265,7 +250,7 @@
             }
         }
 
-        // --- API 2: VERCEL BACKEND (Cobalt Rotator) ---
+        // --- API 2: VERCEL BACKEND ---
         async function fetchViaVercel(url) {
             const response = await fetch('/api/index', {
                 method: "POST",
@@ -277,47 +262,47 @@
 
             if (result.status === 'success') {
                 showResult(
-                    result.data.title || "Media Downloaded",
-                    "Rifqy Server (Cobalt)",
+                    result.data.title || "Media Result",
+                    "Rifqy Server",
                     result.data.url,
                     result.data.audio,
                     result.data.type || 'video' 
                 );
             } else {
-                handleManualFallback(url); // Trigger jika backend menyerah
+                handleManualFallback(url); 
                 throw new Error("Backend Failed"); 
             }
         }
 
-        // --- RENDER HASIL ---
+        // --- TAMPILKAN HASIL ---
         function showResult(title, source, mainUrl, audioUrl, type) {
             document.getElementById('resTitle').innerText = title.length > 50 ? title.substring(0, 50) + "..." : title;
-            document.getElementById('resSource').innerText = "✅ Sukses via " + source;
+            // UPDATE: Sesuai request "Source of:"
+            document.getElementById('resSource').innerText = "Source of: " + source;
             
             const btnMain = document.getElementById('linkMain');
             const btnAudio = document.getElementById('linkAudio');
             const resultArea = document.getElementById('resultArea');
 
-            // Reset Class
+            // Reset & Style Tombol
             btnMain.className = 'btn-download';
 
-            // Cek Tipe (Foto/Video)
             if (type === 'photo' || mainUrl.match(/\.(jpeg|jpg|png|webp)/i)) {
                 btnMain.classList.add('btn-photo');
-                btnMain.innerHTML = "📷 Download Foto HD";
+                btnMain.innerText = "Download Foto";
             } else {
                 btnMain.classList.add('btn-video');
-                btnMain.innerHTML = "🎥 Download Video HD";
+                btnMain.innerText = "Download Video";
             }
 
             btnMain.href = mainUrl;
-            btnMain.style.display = "flex";
+            btnMain.style.display = "block";
 
             // Tombol Audio
             if (audioUrl) {
                 btnAudio.href = audioUrl;
-                btnAudio.style.display = "flex";
-                btnAudio.innerHTML = "🎵 Download Audio";
+                btnAudio.style.display = "block";
+                btnAudio.innerText = "Download Audio";
             } else {
                 btnAudio.style.display = "none";
             }
@@ -325,10 +310,10 @@
             resultArea.style.display = 'block';
         }
         
-        // --- FALLBACK MANUAL (Cadangan Terakhir) ---
+        // --- FALLBACK MANUAL ---
         function handleManualFallback(url) {
-            document.getElementById('resTitle').innerText = "⚠️ Server Sibuk / Konten Private";
-            document.getElementById('resSource').innerText = "Silakan gunakan server alternatif di bawah ini:";
+            document.getElementById('resTitle').innerText = "Konten Private / Limit";
+            document.getElementById('resSource').innerText = "Gunakan server alternatif di bawah:";
             
             const btnMain = document.getElementById('linkMain');
             const btnAudio = document.getElementById('linkAudio');
@@ -338,36 +323,35 @@
             let manualUrl = "#";
             let btnText = "Buka Downloader Manual";
 
-            // Routing Pintar ke Web Luar Terbaik
             if (url.includes('facebook.com') || url.includes('fb.watch')) {
-                manualUrl = "https://snapsave.app"; // Rajanya FB
-                btnText = "➡️ Buka SnapSave (Spesial FB)";
+                manualUrl = "https://snapsave.app"; 
+                btnText = "Buka SnapSave";
             }
             else if (url.includes('threads.net')) {
-                manualUrl = "https://fastdl.app/en"; // Rajanya Threads
-                btnText = "➡️ Buka FastDL (Spesial Threads)";
+                manualUrl = "https://fastdl.app/en"; 
+                btnText = "Buka FastDL";
             } 
             else if (url.includes('twitter.com') || url.includes('x.com')) {
-                manualUrl = "https://ssstwitter.com/"; // Rajanya Twitter
-                btnText = "➡️ Buka SSSTwitter (Spesial X)";
+                manualUrl = "https://ssstwitter.com/"; 
+                btnText = "Buka SSSTwitter";
             }
             else if (url.includes('youtube.com') || url.includes('youtu.be')) {
                 manualUrl = url.replace("youtube.com", "ssyoutube.com").replace("youtu.be/", "ssyoutube.com/");
-                btnText = "➡️ Buka SSYouTube";
+                btnText = "Buka SSYouTube";
             } 
             else if (url.includes('tiktok.com')) {
                 manualUrl = "https://snaptik.app";
-                btnText = "➡️ Buka SnapTik";
+                btnText = "Buka SnapTik";
             } 
             else {
                 manualUrl = `https://savefrom.net/?url=${encodeURIComponent(url)}`;
-                btnText = "➡️ Buka SaveFrom (Universal)";
+                btnText = "Buka SaveFrom";
             }
             
-            btnMain.innerHTML = btnText;
+            btnMain.innerText = btnText;
             btnMain.href = manualUrl;
             
-            btnMain.style.display = "flex";
+            btnMain.style.display = "block";
             btnAudio.style.display = "none";
             resultArea.style.display = 'block';
         }
