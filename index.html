@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RifqyDownloader Pro</title>
     <style>
-        /* --- CSS UPDATE: BLUE THEME --- */
+        /* --- CSS COMBINATION (Gradient Title + Light Blue Button) --- */
         :root {
-            --primary-blue: #0066ff; /* Biru Utama */
-            --hover-blue: #0052cc;
-            --bg-grad: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            /* Warna Text Gradient Lama */
+            --grad-start: #4f46e5; 
+            --grad-end: #ec4899;
+            
+            /* Warna Tombol Baru (Biru Muda) */
+            --btn-light-blue: #0ea5e9; 
+            --btn-hover: #0284c7;
+
+            --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-bg: #ffffff;
-            --text-dark: #333333;
+            --text-main: #1e293b;
         }
 
         body {
@@ -23,7 +29,7 @@
             font-family: 'Segoe UI', sans-serif;
             padding: 20px;
             margin: 0;
-            color: var(--text-dark);
+            color: var(--text-main);
         }
 
         .card {
@@ -32,17 +38,21 @@
             max-width: 480px;
             padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
         }
 
+        /* JUDUL GRADIENT (Kembali ke Awal) */
         .header h1 {
             margin: 0;
-            color: var(--primary-blue);
+            background: linear-gradient(to right, var(--grad-start), var(--grad-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-size: 2rem;
             font-weight: 800;
         }
 
+        /* BADGES ABU-ABU (Kembali ke Awal) */
         .badges {
             display: flex;
             justify-content: center;
@@ -54,11 +64,11 @@
         .badge {
             font-size: 0.75rem;
             padding: 5px 10px;
-            border-radius: 4px;
-            background: #f0f7ff;
-            color: var(--primary-blue);
+            border-radius: 6px;
+            background: #f1f5f9; /* Abu-abu soft */
+            color: #64748b;      /* Text abu tua */
             font-weight: 600;
-            border: 1px solid #cce0ff;
+            border: 1px solid #e2e8f0;
         }
 
         /* Input Area */
@@ -69,9 +79,9 @@
 
         input {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
             outline: none;
             transition: 0.3s;
@@ -79,32 +89,35 @@
         }
 
         input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+            border-color: var(--btn-light-blue);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
 
+        /* TOMBOL UTAMA (Biru Muda) */
         button {
             width: 100%;
-            padding: 15px;
-            background: var(--primary-blue); /* TOMBOL BIRU */
+            padding: 16px;
+            background: var(--btn-light-blue);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
         }
 
         button:hover {
-            background: var(--hover-blue);
-            transform: translateY(-1px);
+            background: var(--btn-hover);
+            transform: translateY(-2px);
         }
 
         button:disabled {
             background: #94a3b8;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         /* Status & Logs */
@@ -120,30 +133,35 @@
         #resultArea {
             display: none;
             margin-top: 2rem;
-            border-top: 1px solid #eee;
+            border-top: 1px dashed #cbd5e1;
             padding-top: 1.5rem;
+            animation: fadeIn 0.5s ease;
         }
 
         .btn-download {
-            display: block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-decoration: none;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             margin-top: 10px;
-            font-weight: 600;
+            font-weight: 700;
             text-align: center;
             color: white;
             transition: 0.2s;
+            gap: 8px; /* Jarak icon ke text */
         }
 
-        .btn-download:hover { opacity: 0.9; }
+        .btn-download:hover { opacity: 0.9; transform: scale(1.02); }
 
-        /* Warna Tombol Hasil */
-        .btn-video { background: #0066ff; } /* Biru */
-        .btn-photo { background: #0066ff; } /* Biru juga (seragam) */
-        .btn-audio { background: #f59e0b; } /* Kuning/Oranye */
-        .btn-manual { background: #ef4444; } /* Merah untuk fallback */
+        /* Warna Tombol Hasil (Tetap warna-warni biar jelas) */
+        .btn-video { background: #10b981; } /* Hijau */
+        .btn-photo { background: #3b82f6; } /* Biru */
+        .btn-audio { background: #f59e0b; } /* Orange */
+        .btn-manual { background: #ef4444; } /* Merah */
 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -154,7 +172,7 @@
             <div class="badges">
                 <span class="badge">Facebook</span>
                 <span class="badge">Threads</span>
-                <span class="badge">Twitter</span>
+                <span class="badge">Twitter/X</span>
                 <span class="badge">TikTok</span>
                 <span class="badge">Instagram</span>
                 <span class="badge">YouTube</span>
@@ -162,7 +180,7 @@
         </div>
 
         <div class="input-box">
-            <input type="text" id="urlInput" placeholder="Tempel link video di sini..." autocomplete="off">
+            <input type="text" id="urlInput" placeholder="Tempelkan link video di sini..." autocomplete="off">
         </div>
 
         <button onclick="startDownload()" id="btnSubmit">Download</button>
@@ -170,7 +188,7 @@
 
         <div id="resultArea">
             <h3 id="resTitle" style="margin-bottom: 5px; font-size: 1.1rem; color:#333;">Judul Media</h3>
-            <p id="resSource" style="font-size: 0.8rem; color:#666; margin-bottom: 15px;">Source of: -</p>
+            <p id="resSource" style="font-size: 0.8rem; color:#888; margin-bottom: 15px;">Source of: -</p>
             
             <a id="linkMain" href="#" target="_blank" class="btn-download btn-video">🎥 Download Video HD</a>
             
@@ -186,14 +204,14 @@
             const btn = document.getElementById('btnSubmit');
             const resultArea = document.getElementById('resultArea');
 
-            if (!url) { alert("Link tidak boleh kosong"); return; }
+            if (!url) { alert("Link tidak boleh kosong!"); return; }
 
             // Reset UI
             resultArea.style.display = 'none';
             btn.disabled = true;
             btn.innerText = "Sedang Memproses...";
             
-            // LOG TANPA ICON
+            // Log Deteksi
             if (url.includes('facebook.com') || url.includes('fb.watch')) log("Menganalisis Link Facebook...");
             else if (url.includes('twitter.com') || url.includes('x.com')) log("Menganalisis Link Twitter...");
             else if (url.includes('threads.net')) log("Menganalisis Link Threads...");
@@ -202,19 +220,19 @@
             else log("Menganalisis Link...");
 
             try {
-                // --- PROSES DOWNLOAD ---
+                // --- STRATEGI DOWNLOAD ---
                 
-                // 1. TIKTOK (Coba TikWM dulu)
+                // 1. TIKTOK
                 if (url.includes('tiktok.com') && !url.includes('music')) {
                     log("Menghubungi Server TikTok...");
                     try {
                         await fetchTikTok(url);
                     } catch (e) {
-                        log("Server TikTok sibuk, mencoba jalur alternatif...");
+                        log("TikWM gagal. Mencoba Server Backup...");
                         await fetchViaVercel(url); 
                     }
                 } 
-                // 2. SOCIAL MEDIA LAINNYA
+                // 2. SOSMED LAINNYA
                 else {
                     log("Menghubungi Server API...");
                     await fetchViaVercel(url);
@@ -224,7 +242,7 @@
 
             } catch (error) {
                 console.error(error);
-                log("Gagal, silahkan gunakan link manual di bawah");
+                log("Gagal, silahkan cek opsi manual.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Download";
@@ -274,10 +292,9 @@
             }
         }
 
-        // --- TAMPILKAN HASIL ---
+        // --- TAMPILKAN HASIL (Pakai Icon) ---
         function showResult(title, source, mainUrl, audioUrl, type) {
             document.getElementById('resTitle').innerText = title.length > 50 ? title.substring(0, 50) + "..." : title;
-            // UPDATE: Sesuai request "Source of:"
             document.getElementById('resSource').innerText = "Source of: " + source;
             
             const btnMain = document.getElementById('linkMain');
@@ -289,20 +306,20 @@
 
             if (type === 'photo' || mainUrl.match(/\.(jpeg|jpg|png|webp)/i)) {
                 btnMain.classList.add('btn-photo');
-                btnMain.innerText = "Download Foto";
+                btnMain.innerHTML = "📷 Download Foto HD"; // ICON FOTO
             } else {
                 btnMain.classList.add('btn-video');
-                btnMain.innerText = "Download Video";
+                btnMain.innerHTML = "🎥 Download Video HD"; // ICON VIDEO
             }
 
             btnMain.href = mainUrl;
-            btnMain.style.display = "block";
+            btnMain.style.display = "flex";
 
             // Tombol Audio
             if (audioUrl) {
                 btnAudio.href = audioUrl;
-                btnAudio.style.display = "block";
-                btnAudio.innerText = "Download Audio";
+                btnAudio.style.display = "flex";
+                btnAudio.innerHTML = "🎵 Download Audio"; // ICON AUDIO
             } else {
                 btnAudio.style.display = "none";
             }
@@ -310,10 +327,10 @@
             resultArea.style.display = 'block';
         }
         
-        // --- FALLBACK MANUAL ---
+        // --- FALLBACK MANUAL (Pakai Icon) ---
         function handleManualFallback(url) {
             document.getElementById('resTitle').innerText = "Konten Private / Limit";
-            document.getElementById('resSource').innerText = "Gunakan server alternatif di bawah:";
+            document.getElementById('resSource').innerText = "Gunakan link alternatif di bawah:";
             
             const btnMain = document.getElementById('linkMain');
             const btnAudio = document.getElementById('linkAudio');
@@ -325,33 +342,33 @@
 
             if (url.includes('facebook.com') || url.includes('fb.watch')) {
                 manualUrl = "https://snapsave.app"; 
-                btnText = "Buka SnapSave";
+                btnText = "➡️ Buka SnapSave (FB)";
             }
             else if (url.includes('threads.net')) {
                 manualUrl = "https://fastdl.app/en"; 
-                btnText = "Buka FastDL";
+                btnText = "➡️ Buka FastDL (Threads)";
             } 
             else if (url.includes('twitter.com') || url.includes('x.com')) {
                 manualUrl = "https://ssstwitter.com/"; 
-                btnText = "Buka SSSTwitter";
+                btnText = "➡️ Buka SSSTwitter (X)";
             }
             else if (url.includes('youtube.com') || url.includes('youtu.be')) {
                 manualUrl = url.replace("youtube.com", "ssyoutube.com").replace("youtu.be/", "ssyoutube.com/");
-                btnText = "Buka SSYouTube";
+                btnText = "➡️ Buka SSYouTube";
             } 
             else if (url.includes('tiktok.com')) {
                 manualUrl = "https://snaptik.app";
-                btnText = "Buka SnapTik";
+                btnText = "➡️ Buka SnapTik";
             } 
             else {
                 manualUrl = `https://savefrom.net/?url=${encodeURIComponent(url)}`;
-                btnText = "Buka SaveFrom";
+                btnText = "➡️ Buka SaveFrom";
             }
             
-            btnMain.innerText = btnText;
+            btnMain.innerHTML = btnText;
             btnMain.href = manualUrl;
             
-            btnMain.style.display = "block";
+            btnMain.style.display = "flex";
             btnAudio.style.display = "none";
             resultArea.style.display = 'block';
         }
