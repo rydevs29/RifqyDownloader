@@ -1,12 +1,9 @@
 {
-  "name": "rifqydownloader-api",
+  "name": "rifqydownloader",
   "version": "1.0.0",
-  "description": "Proxy server untuk downloader",
-  "main": "api/index.js",
-  "scripts": {
-    "start": "node api/index.js"
-  },
+  "description": "Simple Social Media Downloader",
+  "type": "module",
   "dependencies": {
-    "node-fetch": "^3.3.0"
+    "node-fetch": "^3.3.2"
   }
 }
