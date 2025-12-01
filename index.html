@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RifqyDownloader Ultimate</title>
     <style>
-        /* CSS CONFIGURATION (BIRU TUA & GRADIENT) */
+        /* --- CSS CONFIGURATION --- */
         :root {
+            /* Warna Judul Gradient */
             --grad-start: #4f46e5; 
             --grad-end: #ec4899;
-            --btn-main: #0044cc; /* Biru Tua */
+            
+            /* WARNA TOMBOL UTAMA (BIRU TUA - DEEP BLUE) */
+            --btn-main: #0044cc; 
             --btn-hover: #003399;
+
+            /* Background & Text */
             --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -92,7 +97,7 @@
             box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.2);
         }
 
-        /* TOMBOL UTAMA */
+        /* TOMBOL UTAMA (BIRU TUA) */
         button {
             width: 100%;
             padding: 16px;
@@ -149,7 +154,7 @@
             text-align: center;
             color: white;
             transition: 0.2s;
-            gap: 8px; /* Jarak icon */
+            gap: 8px; /* Jarak icon ke text */
         }
 
         .btn-download:hover { opacity: 0.95; transform: scale(1.02); }
@@ -159,6 +164,11 @@
         .btn-photo { background: #3b82f6; } /* Biru */
         .btn-audio { background: #f59e0b; } /* Orange */
         .btn-manual { background: #ef4444; } /* Merah */
+
+        /* Container untuk Gallery Slide */
+        #galleryContainer {
+            margin-bottom: 10px;
+        }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -192,6 +202,8 @@
             <h3 id="resTitle" style="margin-bottom: 5px; font-size: 1.1rem; color:#333;">Media Found</h3>
             <p id="resSource" style="font-size: 0.8rem; color:#888; margin-bottom: 15px;">Source: -</p>
             
+            <div id="galleryContainer"></div>
+
             <a id="linkMain" href="#" target="_blank" class="btn-download btn-video">🎥 Download Video HD</a>
             
             <a id="linkAudio" href="#" target="_blank" class="btn-download btn-audio">🎵 Download Audio</a>
@@ -210,12 +222,13 @@
 
             // Reset UI
             resultArea.style.display = 'none';
+            document.getElementById('galleryContainer').innerHTML = ""; // Bersihkan gallery lama
             btn.disabled = true;
             btn.innerText = "Sedang Memproses...";
             log("Mendeteksi Link...");
 
             try {
-                // 1. TIKTOK (Video & Photo Slide)
+                // 1. TIKTOK (Video & Slide Photo Support)
                 if (url.includes('tiktok.com') && !url.includes('music')) {
                     log("Mengambil data TikTok...");
                     try {
@@ -242,36 +255,24 @@
             }
         }
 
-        // --- API TIKTOK (UPDATE: Support Foto Slide) ---
+        // --- API TIKTOK (Support Slide Photo) ---
         async function fetchTikTok(url) {
             const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
             const res = await fetch(apiUrl);
             const data = await res.json();
             
             if (data.code === 0) {
-                // Cek apakah ini Slide Foto?
+                // Handle Slide Images
                 if (data.data.images && data.data.images.length > 0) {
-                    showResult(
-                        data.data.title || "TikTok Photo Slide", 
-                        "TikWM", 
-                        data.data.images[0], // Ambil foto pertama dulu
-                        data.data.music, 
-                        'photo' // Tipe Foto
-                    );
+                    // Mapping data agar sesuai format gallery
+                    const gallery = data.data.images.map(img => ({ url: img, type: 'photo' }));
+                    showResult(data.data.title, "TikWM", null, data.data.music, 'picker', gallery);
                 } 
-                // Jika Video biasa
+                // Handle Video Biasa
                 else if (data.data.play) {
-                    showResult(
-                        data.data.title || "TikTok Video", 
-                        "TikWM", 
-                        data.data.play, 
-                        data.data.music, 
-                        'video'
-                    );
+                    showResult(data.data.title, "TikWM", data.data.play, data.data.music, 'video', null);
                 }
-            } else { 
-                throw new Error("TikWM Fail"); 
-            }
+            } else { throw new Error("TikWM Fail"); }
         }
 
         // --- API VERCEL (12 Server Backup) ---
@@ -287,11 +288,9 @@
 
                 if (result.status === 'success') {
                     showResult(
-                        result.data.title || "Media Result",
-                        "Rifqy Server",
-                        result.data.url,
-                        result.data.audio,
-                        result.data.type || 'video'
+                        result.data.title, "Rifqy Server", 
+                        result.data.url, result.data.audio, 
+                        result.data.type, result.data.gallery
                     );
                 } else {
                     throw new Error("Backend minta manual");
@@ -301,43 +300,64 @@
             }
         }
 
-        // --- RENDER HASIL (Pakai Icon) ---
-        function showResult(title, source, mainUrl, audioUrl, type) {
-            document.getElementById('resTitle').innerText = title.substring(0, 50) + "...";
+        // --- RENDER HASIL (Support Gallery Slide) ---
+        function showResult(title, source, mainUrl, audioUrl, type, gallery) {
+            document.getElementById('resTitle').innerText = title ? title.substring(0, 50) + "..." : "Media Result";
             document.getElementById('resSource').innerText = "Source of: " + source;
+            
             const btnMain = document.getElementById('linkMain');
             const btnAudio = document.getElementById('linkAudio');
+            const galleryBox = document.getElementById('galleryContainer');
             const resultArea = document.getElementById('resultArea');
 
-            // Reset Fungsi Klik & Style
-            btnMain.onclick = null; 
-            btnMain.className = 'btn-download';
+            // Reset
+            btnMain.style.display = "none";
+            btnAudio.style.display = "none";
+            galleryBox.innerHTML = ""; 
 
-            if (type === 'photo') {
-                btnMain.classList.add('btn-photo');
-                // UPDATE: Text khusus TikTok Photo
-                btnMain.innerHTML = "📷 Download Foto (Slide 1)";
-            } else if (type === 'audio') {
-                btnMain.classList.add('btn-audio');
-                btnMain.innerHTML = "🎵 Download Musik";
-            } else {
-                btnMain.classList.add('btn-video');
-                btnMain.innerHTML = "🎥 Download Video HD";
+            // --- MODE GALLERY (BANYAK SLIDE) ---
+            if ((type === 'picker' || gallery) && gallery && gallery.length > 0) {
+                log(`Ditemukan ${gallery.length} Slide Foto!`);
+                gallery.forEach((item, i) => {
+                    const a = document.createElement('a');
+                    a.href = item.url;
+                    a.target = "_blank";
+                    a.className = "btn-download btn-photo";
+                    a.style.marginBottom = "8px";
+                    a.innerHTML = `📷 Download Slide ke-${i+1}`;
+                    galleryBox.appendChild(a);
+                });
+            } 
+            // --- MODE SINGLE (VIDEO/AUDIO/1 FOTO) ---
+            else {
+                btnMain.style.display = "flex";
+                btnMain.onclick = null; // Hapus event listener manual jika ada
+                btnMain.className = 'btn-download';
+                btnMain.href = mainUrl;
+
+                if (type === 'photo') {
+                    btnMain.classList.add('btn-photo');
+                    btnMain.innerHTML = "📷 Download Foto";
+                } else if (type === 'audio') {
+                    btnMain.classList.add('btn-audio');
+                    btnMain.innerHTML = "🎵 Download Musik";
+                } else {
+                    btnMain.classList.add('btn-video');
+                    btnMain.innerHTML = "🎥 Download Video HD";
+                }
             }
 
-            btnMain.href = mainUrl;
-            btnMain.style.display = "flex";
-
-            if (audioUrl && type !== 'audio') {
+            // Tombol Audio Tambahan
+            if (audioUrl) {
                 btnAudio.href = audioUrl;
                 btnAudio.style.display = "flex";
                 btnAudio.innerHTML = "🎵 Download Audio";
-            } else { btnAudio.style.display = "none"; }
+            }
 
             resultArea.style.display = 'block';
         }
         
-        // --- FALLBACK MANUAL (Tanpa Reddit) ---
+        // --- FALLBACK MANUAL (Auto-Copy) ---
         function handleManualFallback(url) {
             log("Server sibuk. Mengalihkan ke web bantuan...");
             
@@ -345,8 +365,8 @@
             document.getElementById('resSource').innerText = "Link otomatis dicopy! Klik tombol di bawah & Paste di sana.";
             
             const btnMain = document.getElementById('linkMain');
-            const btnAudio = document.getElementById('linkAudio');
             const resultArea = document.getElementById('resultArea');
+            document.getElementById('galleryContainer').innerHTML = ""; // Bersihkan
 
             btnMain.className = 'btn-download btn-manual';
             let manualUrl = "#";
@@ -378,9 +398,10 @@
             };
             
             btnMain.style.display = "flex";
-            btnAudio.style.display = "none";
+            document.getElementById('linkAudio').style.display = "none"; // Hide Audio btn
             resultArea.style.display = 'block';
         }
     </script>
 </body>
-</html>
+                </html>
+    
