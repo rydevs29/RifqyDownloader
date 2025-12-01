@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RifqyDownloader Pro</title>
+    <title>RifqyDownloader Pro - Ultimate</title>
     <style>
-        /* --- CSS COMBINATION (Gradient Title + Light Blue Button) --- */
+        /* --- CSS CONFIGURATION --- */
         :root {
-            /* Warna Text Gradient Lama */
+            /* Warna Judul Gradient */
             --grad-start: #4f46e5; 
             --grad-end: #ec4899;
             
-            /* Warna Tombol Baru (Biru Muda) */
-            --btn-light-blue: #0ea5e9; 
-            --btn-hover: #0284c7;
+            /* WARNA TOMBOL UTAMA (BIRU TUA - DEEP BLUE) */
+            --btn-main: #0044cc; 
+            --btn-hover: #003399;
 
+            /* Background & Text */
             --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -35,14 +36,14 @@
         .card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 480px;
+            max-width: 500px; /* Sedikit diperlebar untuk muat badge */
             padding: 2rem;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
         }
 
-        /* JUDUL GRADIENT (Kembali ke Awal) */
+        /* JUDUL GRADIENT */
         .header h1 {
             margin: 0;
             background: linear-gradient(to right, var(--grad-start), var(--grad-end));
@@ -52,24 +53,27 @@
             font-weight: 800;
         }
 
-        /* BADGES ABU-ABU (Kembali ke Awal) */
+        /* BADGES ABU-ABU (10 Platform) */
         .badges {
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             margin: 15px 0 25px 0;
             flex-wrap: wrap;
         }
 
         .badge {
-            font-size: 0.75rem;
-            padding: 5px 10px;
+            font-size: 0.7rem;
+            padding: 4px 8px;
             border-radius: 6px;
-            background: #f1f5f9; /* Abu-abu soft */
-            color: #64748b;      /* Text abu tua */
+            background: #f1f5f9; 
+            color: #64748b;      
             font-weight: 600;
             border: 1px solid #e2e8f0;
+            transition: 0.2s;
         }
+        
+        .badge:hover { background: #e2e8f0; color: #333; }
 
         /* Input Area */
         .input-box {
@@ -89,15 +93,15 @@
         }
 
         input:focus {
-            border-color: var(--btn-light-blue);
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            border-color: var(--btn-main);
+            box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.2);
         }
 
-        /* TOMBOL UTAMA (Biru Muda) */
+        /* TOMBOL UTAMA (BIRU TUA) */
         button {
             width: 100%;
             padding: 16px;
-            background: var(--btn-light-blue);
+            background: var(--btn-main);
             color: white;
             border: none;
             border-radius: 12px;
@@ -105,7 +109,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 68, 204, 0.3);
         }
 
         button:hover {
@@ -153,9 +157,9 @@
             gap: 8px; /* Jarak icon ke text */
         }
 
-        .btn-download:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-download:hover { opacity: 0.95; transform: scale(1.02); }
 
-        /* Warna Tombol Hasil (Tetap warna-warni biar jelas) */
+        /* Warna Tombol Hasil */
         .btn-video { background: #10b981; } /* Hijau */
         .btn-photo { background: #3b82f6; } /* Biru */
         .btn-audio { background: #f59e0b; } /* Orange */
@@ -176,11 +180,15 @@
                 <span class="badge">TikTok</span>
                 <span class="badge">Instagram</span>
                 <span class="badge">YouTube</span>
+                <span class="badge">Pinterest</span>
+                <span class="badge">Spotify</span>
+                <span class="badge">SoundCloud</span>
+                <span class="badge">Reddit</span>
             </div>
         </div>
 
         <div class="input-box">
-            <input type="text" id="urlInput" placeholder="Tempelkan link video di sini..." autocomplete="off">
+            <input type="text" id="urlInput" placeholder="Tempel link video/audio di sini..." autocomplete="off">
         </div>
 
         <button onclick="startDownload()" id="btnSubmit">Download</button>
@@ -211,30 +219,34 @@
             btn.disabled = true;
             btn.innerText = "Sedang Memproses...";
             
-            // Log Deteksi
+            // LOG DETEKSI PLATFORM (LENGKAP)
             if (url.includes('facebook.com') || url.includes('fb.watch')) log("Menganalisis Link Facebook...");
             else if (url.includes('twitter.com') || url.includes('x.com')) log("Menganalisis Link Twitter...");
             else if (url.includes('threads.net')) log("Menganalisis Link Threads...");
             else if (url.includes('instagram.com')) log("Menganalisis Link Instagram...");
             else if (url.includes('tiktok.com')) log("Menganalisis Link TikTok...");
+            else if (url.includes('pinterest.')) log("Menganalisis Link Pinterest...");
+            else if (url.includes('spotify.com')) log("Menganalisis Link Spotify...");
+            else if (url.includes('soundcloud.com')) log("Menganalisis Link SoundCloud...");
+            else if (url.includes('reddit.com')) log("Menganalisis Link Reddit...");
             else log("Menganalisis Link...");
 
             try {
                 // --- STRATEGI DOWNLOAD ---
                 
-                // 1. TIKTOK
+                // 1. TIKTOK (Jalur Khusus TikWM)
                 if (url.includes('tiktok.com') && !url.includes('music')) {
                     log("Menghubungi Server TikTok...");
                     try {
                         await fetchTikTok(url);
                     } catch (e) {
-                        log("TikWM gagal. Mencoba Server Backup...");
+                        log("Server TikTok sibuk. Mencoba Server Backup...");
                         await fetchViaVercel(url); 
                     }
                 } 
-                // 2. SOSMED LAINNYA
+                // 2. SEMUA SOSMED LAINNYA
                 else {
-                    log("Menghubungi Server API...");
+                    log("Menghubungi Server API Rifqy...");
                     await fetchViaVercel(url);
                 }
 
@@ -242,7 +254,7 @@
 
             } catch (error) {
                 console.error(error);
-                log("Gagal, silahkan cek opsi manual.");
+                log("Gagal, silahkan cek opsi manual di bawah.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Download";
@@ -292,7 +304,7 @@
             }
         }
 
-        // --- TAMPILKAN HASIL (Pakai Icon) ---
+        // --- TAMPILKAN HASIL ---
         function showResult(title, source, mainUrl, audioUrl, type) {
             document.getElementById('resTitle').innerText = title.length > 50 ? title.substring(0, 50) + "..." : title;
             document.getElementById('resSource').innerText = "Source of: " + source;
@@ -301,25 +313,29 @@
             const btnAudio = document.getElementById('linkAudio');
             const resultArea = document.getElementById('resultArea');
 
-            // Reset & Style Tombol
+            // Reset Class
             btnMain.className = 'btn-download';
 
+            // Logika Tipe Konten & Icon
             if (type === 'photo' || mainUrl.match(/\.(jpeg|jpg|png|webp)/i)) {
                 btnMain.classList.add('btn-photo');
-                btnMain.innerHTML = "📷 Download Foto HD"; // ICON FOTO
+                btnMain.innerHTML = "📷 Download Foto HD"; 
+            } else if (type === 'audio' || mainUrl.includes('.mp3')) {
+                btnMain.classList.add('btn-audio');
+                btnMain.innerHTML = "🎵 Download Musik"; 
             } else {
                 btnMain.classList.add('btn-video');
-                btnMain.innerHTML = "🎥 Download Video HD"; // ICON VIDEO
+                btnMain.innerHTML = "🎥 Download Video HD"; 
             }
 
             btnMain.href = mainUrl;
             btnMain.style.display = "flex";
 
-            // Tombol Audio
-            if (audioUrl) {
+            // Tombol Audio Tambahan
+            if (audioUrl && type !== 'audio') {
                 btnAudio.href = audioUrl;
                 btnAudio.style.display = "flex";
-                btnAudio.innerHTML = "🎵 Download Audio"; // ICON AUDIO
+                btnAudio.innerHTML = "🎵 Download Audio"; 
             } else {
                 btnAudio.style.display = "none";
             }
@@ -327,7 +343,7 @@
             resultArea.style.display = 'block';
         }
         
-        // --- FALLBACK MANUAL (Pakai Icon) ---
+        // --- FALLBACK MANUAL (ULTIMATE BACKUP) ---
         function handleManualFallback(url) {
             document.getElementById('resTitle').innerText = "Konten Private / Limit";
             document.getElementById('resSource').innerText = "Gunakan link alternatif di bawah:";
@@ -340,6 +356,7 @@
             let manualUrl = "#";
             let btnText = "Buka Downloader Manual";
 
+            // LOGIKA ROUTING KE 10 WEB CADANGAN
             if (url.includes('facebook.com') || url.includes('fb.watch')) {
                 manualUrl = "https://snapsave.app"; 
                 btnText = "➡️ Buka SnapSave (FB)";
@@ -351,6 +368,22 @@
             else if (url.includes('twitter.com') || url.includes('x.com')) {
                 manualUrl = "https://ssstwitter.com/"; 
                 btnText = "➡️ Buka SSSTwitter (X)";
+            }
+            else if (url.includes('pinterest.')) {
+                manualUrl = "https://pinterestdownloader.com/"; 
+                btnText = "➡️ Buka PinterestDL";
+            }
+            else if (url.includes('soundcloud.com')) {
+                manualUrl = "https://sclouddownloader.net/"; 
+                btnText = "➡️ Buka SoundCloudDL";
+            }
+            else if (url.includes('spotify.com')) {
+                manualUrl = "https://spotifydown.com/"; 
+                btnText = "➡️ Buka SpotifyDown";
+            }
+            else if (url.includes('reddit.com')) {
+                manualUrl = "https://rapidsave.com/"; 
+                btnText = "➡️ Buka RapidSave (Reddit)";
             }
             else if (url.includes('youtube.com') || url.includes('youtu.be')) {
                 manualUrl = url.replace("youtube.com", "ssyoutube.com").replace("youtu.be/", "ssyoutube.com/");
