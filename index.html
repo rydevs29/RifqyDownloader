@@ -300,7 +300,7 @@
             }
         }
 
-        // --- RENDER HASIL (Support Gallery Slide) ---
+        // --- RENDER HASIL (Updated Text) ---
         function showResult(title, source, mainUrl, audioUrl, type, gallery) {
             document.getElementById('resTitle').innerText = title ? title.substring(0, 50) + "..." : "Media Result";
             document.getElementById('resSource').innerText = "Source of: " + source;
@@ -324,20 +324,21 @@
                     a.target = "_blank";
                     a.className = "btn-download btn-photo";
                     a.style.marginBottom = "8px";
-                    a.innerHTML = `📷 Download Slide ke-${i+1}`;
+                    // UPDATE TEXT DI SINI
+                    a.innerHTML = `📷 Download Photo (${i+1})`; 
                     galleryBox.appendChild(a);
                 });
             } 
             // --- MODE SINGLE (VIDEO/AUDIO/1 FOTO) ---
             else {
                 btnMain.style.display = "flex";
-                btnMain.onclick = null; // Hapus event listener manual jika ada
+                btnMain.onclick = null; 
                 btnMain.className = 'btn-download';
                 btnMain.href = mainUrl;
 
                 if (type === 'photo') {
                     btnMain.classList.add('btn-photo');
-                    btnMain.innerHTML = "📷 Download Foto";
+                    btnMain.innerHTML = "📷 Download Photo";
                 } else if (type === 'audio') {
                     btnMain.classList.add('btn-audio');
                     btnMain.innerHTML = "🎵 Download Musik";
@@ -398,10 +399,9 @@
             };
             
             btnMain.style.display = "flex";
-            document.getElementById('linkAudio').style.display = "none"; // Hide Audio btn
+            document.getElementById('linkAudio').style.display = "none"; 
             resultArea.style.display = 'block';
         }
     </script>
 </body>
-                </html>
-    
+</html>
