@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
-    // 1. CORS & Config
+    // 1. Config
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -13,40 +13,35 @@ export default async function handler(req, res) {
 
     console.log(`[Processing] ${url}`);
 
-    // 2. DAFTAR MONSTER SERVER (12 Server)
-    // Kita mix server Official, Community, dan Hosting berbeda (Render/Railway/Vercel lain)
-    // Tujuannya biar IP-nya beda-beda dan tidak kena blokir masal.
+    // 2. MONSTER SERVER LIST (12 Backup)
     const apiNodes = [
-        "https://api.cobalt.tools/api/json",          // 1. Official (Sering limit, tapi wajib coba)
-        "https://co.wuk.sh/api/json",                 // 2. King of Stability
-        "https://cobalt.api.kwiatekmiki.pl/api/json", // 3. Poland Server
-        "https://api.server.lunes.host/api/json",     // 4. Lunes Host
-        "https://cobalt.adeprolin.com/api/json",      // 5. Community 1
-        "https://cobalt.mp3converters.com/api/json",  // 6. Community 2
-        "https://api.tikapp.ml/api/json",             // 7. TikApp Backup
-        "https://cobalt.dobl.in/api/json",            // 8. Dublin Server
-        "https://cobalt.kinuseka.net/api/json",       // 9. Kinuseka Server
-        "https://cobalt.q11.st/api/json",             // 10. Q11 Server
-        "https://w.fieryflames.dev/api/json",         // 11. FieryDev
-        "https://hyrun.club/api/json"                 // 12. Hyrun Club
+        "https://api.cobalt.tools/api/json",          
+        "https://co.wuk.sh/api/json",                 
+        "https://cobalt.api.kwiatekmiki.pl/api/json", 
+        "https://api.server.lunes.host/api/json",     
+        "https://cobalt.adeprolin.com/api/json",      
+        "https://cobalt.mp3converters.com/api/json",  
+        "https://api.tikapp.ml/api/json",             
+        "https://cobalt.dobl.in/api/json",            
+        "https://cobalt.kinuseka.net/api/json",       
+        "https://cobalt.q11.st/api/json",             
+        "https://w.fieryflames.dev/api/json",         
+        "https://hyrun.club/api/json"                 
     ];
 
-    // Header Randomizer (Supaya tidak terdeteksi sebagai bot yang sama)
     const userAgents = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/115.0"
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
     ];
 
     let finalResult = null;
     let success = false;
 
-    // 3. PROSES PENGECEKAN BERLAPIS
+    // 3. PROSES CEK SERVER
     for (const server of apiNodes) {
         if (success) break;
 
         try {
-            // Pilih User Agent acak
             const randomUA = userAgents[Math.floor(Math.random() * userAgents.length)];
             
             const payload = {
@@ -54,10 +49,9 @@ export default async function handler(req, res) {
                 vQuality: "720",
                 filenamePattern: "basic",
                 isAudioOnly: false,
-                disableMetadata: true // Biar lebih ringan & cepat
+                disableMetadata: true
             };
 
-            // Timeout dipercepat jadi 5 detik per server biar user gak nunggu lama
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 5000);
 
@@ -67,7 +61,7 @@ export default async function handler(req, res) {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
                     "User-Agent": randomUA,
-                    "Origin": "https://google.com", // Fake Origin
+                    "Origin": "https://google.com",
                     "Referer": "https://google.com/"
                 },
                 body: JSON.stringify(payload),
@@ -75,22 +69,22 @@ export default async function handler(req, res) {
             });
             clearTimeout(timeout);
 
-            if (!response.ok) continue; // Skip jika server error
+            if (!response.ok) continue;
 
             const data = await response.json();
 
             if (data && (data.url || data.stream || data.picker)) {
                 
-                // A. Handle Gallery/Slide (IG/Threads/Twitter)
+                // Handle Slide
                 if (data.picker) {
                     finalResult = {
                         url: data.picker[0].url,
                         title: "Media Gallery",
-                        type: data.picker[0].type, // 'photo' or 'video'
+                        type: data.picker[0].type, 
                         audio: null
                     };
                 } 
-                // B. Handle Single Media (YT/Spotify/Soundcloud)
+                // Handle Single
                 else {
                     finalResult = {
                         url: data.url || data.stream,
@@ -99,39 +93,29 @@ export default async function handler(req, res) {
                         audio: data.audio || null
                     };
 
-                    // Deteksi Audio Murni (Spotify/Soundcloud)
-                    if (finalResult.url && (
-                        finalResult.url.includes('.mp3') || 
-                        finalResult.url.includes('.m4a') || 
-                        finalResult.url.includes('.wav') ||
-                        finalResult.url.includes('googlevideo.com') // Kadang YT audio linknya begini
-                    )) {
+                    if (finalResult.url && (finalResult.url.includes('.mp3') || finalResult.url.includes('googlevideo.com'))) {
                         finalResult.type = 'audio';
                     }
-                    
-                    // Deteksi Foto Murni
                     if (finalResult.url && (finalResult.url.match(/\.(jpeg|jpg|png|webp)/i))) {
                          finalResult.type = 'photo';
                     }
                 }
                 
                 success = true;
-                console.log(`[Success] Hit server: ${server}`);
             }
 
         } catch (e) {
-            // Silent error, lanjut ke server berikutnya
+            // Lanjut ke server berikutnya
         }
     }
 
-    // 4. HASIL AKHIR
+    // 4. HASIL
     if (success && finalResult) {
         return res.status(200).json({ status: 'success', data: finalResult });
     } else {
-        // Jika 12 server gagal semua (kemungkinan besar IP Vercel diblokir total hari itu)
         return res.status(200).json({ 
             status: 'fallback', 
-            message: 'Semua server sibuk/limit. Gunakan manual.' 
+            message: 'Semua server sibuk' 
         });
     }
 }
