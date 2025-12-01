@@ -3,19 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RifqyDownloader Pro - Ultimate</title>
+    <title>RifqyDownloader Ultimate</title>
     <style>
-        /* --- CSS CONFIGURATION --- */
+        /* CSS CONFIGURATION (BIRU TUA & GRADIENT) */
         :root {
-            /* Warna Judul Gradient */
             --grad-start: #4f46e5; 
             --grad-end: #ec4899;
-            
-            /* WARNA TOMBOL UTAMA (BIRU TUA - DEEP BLUE) */
-            --btn-main: #0044cc; 
+            --btn-main: #0044cc; /* Biru Tua */
             --btn-hover: #003399;
-
-            /* Background & Text */
             --bg-grad: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -36,7 +31,7 @@
         .card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 500px; /* Sedikit diperlebar untuk muat badge */
+            max-width: 500px;
             padding: 2rem;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
@@ -53,7 +48,7 @@
             font-weight: 800;
         }
 
-        /* BADGES ABU-ABU (10 Platform) */
+        /* BADGES (Tanpa Reddit) */
         .badges {
             display: flex;
             justify-content: center;
@@ -97,7 +92,7 @@
             box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.2);
         }
 
-        /* TOMBOL UTAMA (BIRU TUA) */
+        /* TOMBOL UTAMA */
         button {
             width: 100%;
             padding: 16px;
@@ -154,12 +149,12 @@
             text-align: center;
             color: white;
             transition: 0.2s;
-            gap: 8px; /* Jarak icon ke text */
+            gap: 8px; /* Jarak icon */
         }
 
         .btn-download:hover { opacity: 0.95; transform: scale(1.02); }
 
-        /* Warna Tombol Hasil */
+        /* Variant Warna Tombol */
         .btn-video { background: #10b981; } /* Hijau */
         .btn-photo { background: #3b82f6; } /* Biru */
         .btn-audio { background: #f59e0b; } /* Orange */
@@ -175,28 +170,27 @@
             <h1>RifqyDownloader</h1>
             <div class="badges">
                 <span class="badge">Facebook</span>
+                <span class="badge">Pinterest</span>
+                <span class="badge">Spotify</span>
+                <span class="badge">SoundCloud</span>
                 <span class="badge">Threads</span>
                 <span class="badge">Twitter/X</span>
                 <span class="badge">TikTok</span>
                 <span class="badge">Instagram</span>
                 <span class="badge">YouTube</span>
-                <span class="badge">Pinterest</span>
-                <span class="badge">Spotify</span>
-                <span class="badge">SoundCloud</span>
-                <span class="badge">Reddit</span>
             </div>
         </div>
 
         <div class="input-box">
-            <input type="text" id="urlInput" placeholder="Tempel link video/audio di sini..." autocomplete="off">
+            <input type="text" id="urlInput" placeholder="Tempel link (TikTok/IG/Spotify/dll)..." autocomplete="off">
         </div>
 
         <button onclick="startDownload()" id="btnSubmit">Download</button>
         <div class="status-log" id="statusLog"></div>
 
         <div id="resultArea">
-            <h3 id="resTitle" style="margin-bottom: 5px; font-size: 1.1rem; color:#333;">Judul Media</h3>
-            <p id="resSource" style="font-size: 0.8rem; color:#888; margin-bottom: 15px;">Source of: -</p>
+            <h3 id="resTitle" style="margin-bottom: 5px; font-size: 1.1rem; color:#333;">Media Found</h3>
+            <p id="resSource" style="font-size: 0.8rem; color:#888; margin-bottom: 15px;">Source: -</p>
             
             <a id="linkMain" href="#" target="_blank" class="btn-download btn-video">🎥 Download Video HD</a>
             
@@ -218,135 +212,137 @@
             resultArea.style.display = 'none';
             btn.disabled = true;
             btn.innerText = "Sedang Memproses...";
-            
-            // LOG DETEKSI PLATFORM (LENGKAP)
-            if (url.includes('facebook.com') || url.includes('fb.watch')) log("Menganalisis Link Facebook...");
-            else if (url.includes('twitter.com') || url.includes('x.com')) log("Menganalisis Link Twitter...");
-            else if (url.includes('threads.net')) log("Menganalisis Link Threads...");
-            else if (url.includes('instagram.com')) log("Menganalisis Link Instagram...");
-            else if (url.includes('tiktok.com')) log("Menganalisis Link TikTok...");
-            else if (url.includes('pinterest.')) log("Menganalisis Link Pinterest...");
-            else if (url.includes('spotify.com')) log("Menganalisis Link Spotify...");
-            else if (url.includes('soundcloud.com')) log("Menganalisis Link SoundCloud...");
-            else if (url.includes('reddit.com')) log("Menganalisis Link Reddit...");
-            else log("Menganalisis Link...");
+            log("Mendeteksi Link...");
 
             try {
-                // --- STRATEGI DOWNLOAD ---
-                
-                // 1. TIKTOK (Jalur Khusus TikWM)
+                // 1. TIKTOK (Video & Photo Slide)
                 if (url.includes('tiktok.com') && !url.includes('music')) {
-                    log("Menghubungi Server TikTok...");
+                    log("Mengambil data TikTok...");
                     try {
                         await fetchTikTok(url);
                     } catch (e) {
-                        log("Server TikTok sibuk. Mencoba Server Backup...");
-                        await fetchViaVercel(url); 
+                        log("TikTok Gagal, Mencoba Backup...");
+                        await fetchViaVercel(url);
                     }
                 } 
-                // 2. SEMUA SOSMED LAINNYA
+                // 2. SOSMED LAIN (Backend Vercel)
                 else {
-                    log("Menghubungi Server API Rifqy...");
+                    log("Menghubungi Server...");
                     await fetchViaVercel(url);
                 }
 
                 log("Selesai, Silahkan Download");
 
             } catch (error) {
-                console.error(error);
-                log("Gagal, silahkan cek opsi manual di bawah.");
+                console.error("Error utama:", error);
+                handleManualFallback(url);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Download";
             }
         }
 
-        // --- API 1: TIKTOK ---
+        // --- API TIKTOK (UPDATE: Support Foto Slide) ---
         async function fetchTikTok(url) {
             const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
             const res = await fetch(apiUrl);
             const data = await res.json();
-
-            if (data.code === 0 && data.data.play) {
-                showResult(
-                    data.data.title || "TikTok Video", 
-                    "TikWM Server", 
-                    data.data.play, 
-                    data.data.music,
-                    'video'
-                );
-            } else {
-                throw new Error("TikWM Fail");
-            }
-        }
-
-        // --- API 2: VERCEL BACKEND ---
-        async function fetchViaVercel(url) {
-            const response = await fetch('/api/index', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url: url })
-            });
-
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                showResult(
-                    result.data.title || "Media Result",
-                    "Rifqy Server",
-                    result.data.url,
-                    result.data.audio,
-                    result.data.type || 'video' 
-                );
-            } else {
-                handleManualFallback(url); 
-                throw new Error("Backend Failed"); 
-            }
-        }
-
-        // --- TAMPILKAN HASIL ---
-        function showResult(title, source, mainUrl, audioUrl, type) {
-            document.getElementById('resTitle').innerText = title.length > 50 ? title.substring(0, 50) + "..." : title;
-            document.getElementById('resSource').innerText = "Source of: " + source;
             
+            if (data.code === 0) {
+                // Cek apakah ini Slide Foto?
+                if (data.data.images && data.data.images.length > 0) {
+                    showResult(
+                        data.data.title || "TikTok Photo Slide", 
+                        "TikWM", 
+                        data.data.images[0], // Ambil foto pertama dulu
+                        data.data.music, 
+                        'photo' // Tipe Foto
+                    );
+                } 
+                // Jika Video biasa
+                else if (data.data.play) {
+                    showResult(
+                        data.data.title || "TikTok Video", 
+                        "TikWM", 
+                        data.data.play, 
+                        data.data.music, 
+                        'video'
+                    );
+                }
+            } else { 
+                throw new Error("TikWM Fail"); 
+            }
+        }
+
+        // --- API VERCEL (12 Server Backup) ---
+        async function fetchViaVercel(url) {
+            try {
+                const response = await fetch('/api/index', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showResult(
+                        result.data.title || "Media Result",
+                        "Rifqy Server",
+                        result.data.url,
+                        result.data.audio,
+                        result.data.type || 'video'
+                    );
+                } else {
+                    throw new Error("Backend minta manual");
+                }
+            } catch (e) {
+                throw e;
+            }
+        }
+
+        // --- RENDER HASIL (Pakai Icon) ---
+        function showResult(title, source, mainUrl, audioUrl, type) {
+            document.getElementById('resTitle').innerText = title.substring(0, 50) + "...";
+            document.getElementById('resSource').innerText = "Source of: " + source;
             const btnMain = document.getElementById('linkMain');
             const btnAudio = document.getElementById('linkAudio');
             const resultArea = document.getElementById('resultArea');
 
-            // Reset Class
+            // Reset Fungsi Klik & Style
+            btnMain.onclick = null; 
             btnMain.className = 'btn-download';
 
-            // Logika Tipe Konten & Icon
-            if (type === 'photo' || mainUrl.match(/\.(jpeg|jpg|png|webp)/i)) {
+            if (type === 'photo') {
                 btnMain.classList.add('btn-photo');
-                btnMain.innerHTML = "📷 Download Foto HD"; 
-            } else if (type === 'audio' || mainUrl.includes('.mp3')) {
+                // UPDATE: Text khusus TikTok Photo
+                btnMain.innerHTML = "📷 Download Foto (Slide 1)";
+            } else if (type === 'audio') {
                 btnMain.classList.add('btn-audio');
-                btnMain.innerHTML = "🎵 Download Musik"; 
+                btnMain.innerHTML = "🎵 Download Musik";
             } else {
                 btnMain.classList.add('btn-video');
-                btnMain.innerHTML = "🎥 Download Video HD"; 
+                btnMain.innerHTML = "🎥 Download Video HD";
             }
 
             btnMain.href = mainUrl;
             btnMain.style.display = "flex";
 
-            // Tombol Audio Tambahan
             if (audioUrl && type !== 'audio') {
                 btnAudio.href = audioUrl;
                 btnAudio.style.display = "flex";
-                btnAudio.innerHTML = "🎵 Download Audio"; 
-            } else {
-                btnAudio.style.display = "none";
-            }
+                btnAudio.innerHTML = "🎵 Download Audio";
+            } else { btnAudio.style.display = "none"; }
 
             resultArea.style.display = 'block';
         }
         
-        // --- FALLBACK MANUAL (ULTIMATE BACKUP) ---
+        // --- FALLBACK MANUAL (Tanpa Reddit) ---
         function handleManualFallback(url) {
-            document.getElementById('resTitle').innerText = "Konten Private / Limit";
-            document.getElementById('resSource').innerText = "Gunakan link alternatif di bawah:";
+            log("Server sibuk. Mengalihkan ke web bantuan...");
+            
+            document.getElementById('resTitle').innerText = "⚠️ Server Limit / Gagal";
+            document.getElementById('resSource').innerText = "Link otomatis dicopy! Klik tombol di bawah & Paste di sana.";
             
             const btnMain = document.getElementById('linkMain');
             const btnAudio = document.getElementById('linkAudio');
@@ -354,52 +350,32 @@
 
             btnMain.className = 'btn-download btn-manual';
             let manualUrl = "#";
-            let btnText = "Buka Downloader Manual";
+            let btnText = "Buka Web Bantuan";
 
-            // LOGIKA ROUTING KE 10 WEB CADANGAN
-            if (url.includes('facebook.com') || url.includes('fb.watch')) {
-                manualUrl = "https://snapsave.app"; 
-                btnText = "➡️ Buka SnapSave (FB)";
-            }
-            else if (url.includes('threads.net')) {
-                manualUrl = "https://fastdl.app/en"; 
-                btnText = "➡️ Buka FastDL (Threads)";
-            } 
-            else if (url.includes('twitter.com') || url.includes('x.com')) {
-                manualUrl = "https://ssstwitter.com/"; 
-                btnText = "➡️ Buka SSSTwitter (X)";
-            }
-            else if (url.includes('pinterest.')) {
-                manualUrl = "https://pinterestdownloader.com/"; 
-                btnText = "➡️ Buka PinterestDL";
-            }
-            else if (url.includes('soundcloud.com')) {
-                manualUrl = "https://sclouddownloader.net/"; 
-                btnText = "➡️ Buka SoundCloudDL";
-            }
-            else if (url.includes('spotify.com')) {
-                manualUrl = "https://spotifydown.com/"; 
-                btnText = "➡️ Buka SpotifyDown";
-            }
-            else if (url.includes('reddit.com')) {
-                manualUrl = "https://rapidsave.com/"; 
-                btnText = "➡️ Buka RapidSave (Reddit)";
-            }
-            else if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                manualUrl = url.replace("youtube.com", "ssyoutube.com").replace("youtu.be/", "ssyoutube.com/");
-                btnText = "➡️ Buka SSYouTube";
-            } 
-            else if (url.includes('tiktok.com')) {
-                manualUrl = "https://snaptik.app";
-                btnText = "➡️ Buka SnapTik";
-            } 
-            else {
-                manualUrl = `https://savefrom.net/?url=${encodeURIComponent(url)}`;
-                btnText = "➡️ Buka SaveFrom";
-            }
+            // LOGIKA LINK MANUAL
+            if (url.includes('pinterest.')) { manualUrl = "https://pinterestdownloader.com/"; btnText = "➡️ Buka PinterestDL"; }
+            else if (url.includes('spotify.com')) { manualUrl = "https://spotifydown.com/"; btnText = "➡️ Buka SpotifyDown"; }
+            else if (url.includes('soundcloud.com')) { manualUrl = "https://sclouddownloader.net/"; btnText = "➡️ Buka SoundCloudDL"; }
+            else if (url.includes('instagram.com')) { manualUrl = "https://snapinst.app/"; btnText = "➡️ Buka SnapInsta"; }
+            else if (url.includes('facebook.com') || url.includes('fb.watch')) { manualUrl = "https://snapsave.app"; btnText = "➡️ Buka SnapSave"; }
+            else if (url.includes('youtube.com') || url.includes('youtu.be')) { manualUrl = "https://ssyoutube.com/en"; btnText = "➡️ Buka SSYouTube"; } 
+            else if (url.includes('twitter.com') || url.includes('x.com')) { manualUrl = "https://ssstwitter.com/"; btnText = "➡️ Buka SSSTwitter"; }
+            else if (url.includes('threads.net')) { manualUrl = "https://fastdl.app/en"; btnText = "➡️ Buka FastDL"; }
+            else { manualUrl = `https://savefrom.net/`; btnText = "➡️ Buka SaveFrom"; }
             
+            // AUTO COPY LOGIC
             btnMain.innerHTML = btnText;
-            btnMain.href = manualUrl;
+            btnMain.href = "#"; 
+            
+            btnMain.onclick = function(e) {
+                e.preventDefault();
+                navigator.clipboard.writeText(url).then(() => {
+                    alert("✅ Link berhasil dicopy!\n\nSilakan 'Paste' di kolom website yang akan terbuka.");
+                    window.open(manualUrl, '_blank');
+                }).catch(err => {
+                    window.open(manualUrl, '_blank');
+                });
+            };
             
             btnMain.style.display = "flex";
             btnAudio.style.display = "none";
