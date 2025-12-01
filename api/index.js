@@ -50,7 +50,7 @@ export default async function handler(req, res) {
                 // --- DETEKSI SLIDE GALLERY ---
                 if (data.picker) {
                     finalResult = {
-                        gallery: data.picker, // Kirim Full Array
+                        gallery: data.picker, 
                         title: "Media Gallery",
                         type: 'picker'
                     };
